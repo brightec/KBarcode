@@ -1,0 +1,19 @@
+// Gradle snippet to rename the generated apk files format
+// {appName}-{variant.baseName}-{variant.versionCode}.apk
+// e.g. testApp-devDebug-110.apk
+// To override the appName, set applicationName in the gradle.properties file
+// e.g. applicationName=NewAppName
+
+android.applicationVariants.all { variant ->
+    def appName
+    //Check if an applicationName property is supplied; if not use the name of the parent project.
+    if (project.hasProperty("applicationName")) {
+        appName = applicationName
+    } else {
+        appName = parent.name
+    }
+
+    variant.outputs.all {
+        outputFileName = "${appName}-${variant.name}-${variant.versionCode}.apk"
+    }
+}

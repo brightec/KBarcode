@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BarcodeView">
+        <attr name="cameraFacing" format="enum">
+            <enum name="front" value="0" />
+            <enum name="back" value="1" />
+            <enum name="external" value="2" />
+        </attr>
+        <attr name="formats" format="enum">
+            <enum name="all" value="0" />
+            <!-- CODABAR, EAN_13, EAN_8, ITF, UPC_A, UPC_E -->
+            <enum name="numeric" value="1" />
+            <!-- CODE_128, CODE_39, CODE_93 -->
+            <enum name="alphanumeric" value="2" />
+            <!-- DATA_MATRIX, QR_CODE, PDF417, AZTEC -->
+            <enum name="data" value="3" />
+            <!-- EAN_13, EAN_8 -->
+            <enum name="ean" value="4" />
+        </attr>
+        <attr name="minBarcodeWidth" format="integer" />
+        <attr name="sort" format="enum">
+            <enum name="none" value="0" />
+            <enum name="central" value="1" />
+        </attr>
+        <attr name="scaleType" format="enum">
+            <enum name="centerInside" value="0" />
+            <enum name="centerCrop" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

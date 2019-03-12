@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore the Invalid Package issue in the given files -->
+    <issue id="InvalidPackage">
+        <ignore regexp="okio.*jar" />
+        <ignore regexp="simple-xml.*jar" />
+    </issue>
+
+	<!-- Ignore warnings in generated files -->
+	<issue id="all">
+    	<ignore path="app/build/generated" />
+    	<ignore path="build/generated" />
+    </issue>
+</lint>

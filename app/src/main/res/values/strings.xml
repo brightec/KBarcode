@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">KBarcode</string>
+
+    <string name="title_xml">Xml Based</string>
+    <string name="title_xml_java">Xml Java Based</string>
+    <string name="title_programmatic">Programmatic Based</string>
+    <string name="title_viewfinder">Viewfinder Based</string>
+    <string name="title_camera_rationale">Why camera?</string>
+
+    <string name="message_camera_rationale">We use your camera to scan barcodes</string>
+
+    <string name="action_ok">OK</string>
+
+    <string name="error_processing_barcode">Unable to process barcode</string>
+</resources>

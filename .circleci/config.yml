@@ -1,0 +1,227 @@
+version: 2
+
+references:
+  workspace: &workspace
+    ~/workspace
+
+  setup_config: &setup_config
+    working_directory: *workspace
+    docker:
+      - image: circleci/android:api-28-node8-alpha
+    environment:
+      JVM_OPTS: -Xmx3200m
+      KEYSTORE_PATH: ../app.keystore
+
+  download_keystores: &download_keystores
+    run:
+      name: Download Keystores
+      command: |
+        wget --no-check-certificate ${KEYSTORE_URL} -O app.keystore -q
+
+  check_halt: &check_halt
+    run:
+      name: Checking whether to halt this job
+      command: |
+        if [[ `cat /tmp/workspace/persist/job-halt` == 1 ]]; then
+          echo "Job not required"
+          circleci step halt
+        fi
+
+  download_google_services: &download_google_services
+    run:
+      name: Download google-services.json
+      command: |
+        echo $GOOGLE_SERVICES | base64 -di > app/google-services.json
+
+jobs:
+  nightly_check:
+    <<: *setup_config
+    steps:
+      - run:
+          name: Get last build SHA1
+          command: |
+            HTTP_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+              --request GET \
+              "https://api.keyvalue.xyz/$LAST_BUILD_TOKEN/$CIRCLE_PROJECT_REPONAME")
+            LAST_BUILD=$(echo $HTTP_LAST_BUILD | sed -e 's/HTTPSTATUS\:.*//g')
+            STATUS_LAST_BUILD=$(echo $HTTP_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            if [ $STATUS_LAST_BUILD != 200 ]; then
+              echo -e "Fetching key value for last build failed.\nStatus: $STATUS_LAST_BUILD"
+              echo "See https://github.com/kvaas/docs/blob/master/REST%20API.md for help"
+              exit 1
+            else
+              echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
+            fi
+      - run:
+          name: Save current SHA1
+          command: |
+            HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+              --request POST \
+              "https://api.keyvalue.xyz/$LAST_BUILD_TOKEN/$CIRCLE_PROJECT_REPONAME/$CIRCLE_SHA1")
+              STATUS_SAVE_LAST_BUILD=$(echo $HTTP_SAVE_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            if [ $STATUS_SAVE_LAST_BUILD != 200 ]; then
+              echo -e "Saving key value for last build failed.\nStatus: $STATUS_SAVE_LAST_BUILD"
+              echo "See https://github.com/kvaas/docs/blob/master/REST%20API.md for help"
+              exit 1
+            fi
+      - checkout
+      - run:
+          name: Check if deployment is required
+          command: |
+            mkdir -p workspace/persist
+            if [ "$LAST_BUILD" != '' ] && [ $LAST_BUILD == $CIRCLE_SHA1 ]; then
+              echo "Job not required"
+              echo 1 > workspace/persist/job-halt
+            fi
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - persist
+
+  tests:
+    <<: *setup_config
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - *check_halt
+      - checkout
+      - *download_google_services
+      - run:
+          name: Generate cache key
+          command: ./.circleci/scripts/checksum.sh /tmp/checksum.txt
+      - restore_cache:
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+              - ~/.gradle
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - run:
+          name: Run checks
+          command: ./gradlew check -x test
+      - run:
+          name: Install and Run Danger
+          command: ./.circleci/scripts/run-danger.sh
+      - run:
+          name: Run Unit Tests
+          command: ./gradlew test
+      - run:
+          name: Collect artifacts
+          command: ./.circleci/scripts/collect-artifacts.sh /tmp/artifacts
+          when: always
+      - store_artifacts:
+          path: /tmp/artifacts
+          destination: /artifacts
+      - store_test_results:
+          path: app/build/test-results
+      - run:
+          name: Assemble APKs
+          command: eval "$COMMAND_CREATE_APKS_TEST"
+      - run:
+          name: Setup GCP
+          command: ./.circleci/scripts/gcp-setup.sh
+      - run:
+          name: Run tests on Firebase Test Lab
+          command: ./.circleci/scripts/fb-run-tests.sh $CIRCLE_PROJECT_REPONAME $CIRCLE_BUILD_NUM /tmp/firebase_test_results $FB_TEST_LAB_BUCKET
+          no_output_timeout: 30m
+      - store_artifacts:
+          path: /tmp/firebase_test_results
+          destination: /firebase_test_results
+
+  dist_qa:
+    <<: *setup_config
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - *check_halt
+      - checkout
+      - *download_google_services
+      - run:
+          name: Generate cache key
+          command: ./.circleci/scripts/checksum.sh /tmp/checksum.txt
+      - restore_cache:
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+              - ~/.gradle
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - *download_keystores
+      - run:
+          name: Assemble and deploy
+          command: |
+            eval "$COMMAND_CREATE_APKS_DIST_QA"
+            if [ $DEPLOY_PLATFORM_QA == "PLAYSTORE" ]; then
+              ./.circleci/scripts/upload-playstore.sh "$PLAYSTORE_SERVICE_KEY" $APK_PATH $CIRCLE_BUILD_NUM internal false
+            else
+              echo "No deployment completed. See artifacts for builds"
+            fi
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apk
+      - store_artifacts:
+          path: app/build/outputs/mapping
+          destination: mapping
+
+  dist_release:
+    <<: *setup_config
+    steps:
+      - checkout
+      - *download_google_services
+      - run:
+          name: Generate cache key
+          command: ./.circleci/scripts/checksum.sh /tmp/checksum.txt
+      - restore_cache:
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+              - ~/.gradle
+          key: gradle-{{ checksum "/tmp/checksum.txt" }}
+      - run:
+          name: Assemble library and distibute
+          command: |
+            eval "$COMMAND_CREATE_LIB_DIST_RELEASE"
+      - store_artifacts:
+          path: kbarcode/build/outputs/aar
+          destination: apk
+      - store_artifacts:
+          path: kbarcode/build/outputs/mapping
+          destination: mapping
+
+workflows:
+  version: 2
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1-5"
+          filters:
+            branches:
+              only: master
+    jobs:
+      - nightly_check
+      - tests:
+          context: Android-Tests
+          requires:
+            - nightly_check
+      - dist_qa:
+          requires:
+            - tests
+  merge_checks:
+    jobs:
+      - tests:
+          context: Android-Tests
+  release:
+    jobs:
+      - dist_release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/

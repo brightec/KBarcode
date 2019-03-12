@@ -1,0 +1,108 @@
+/**
+ * Gradle tasks added:
+ * - checkstyle
+ * - pmd
+ * - ktlint
+ * - detekt
+ *
+ * These tasks above are added to perform code analysis. They are dependencies of the check task
+ * so running check will run all of them.
+ */
+
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+repositories {
+    jcenter()
+}
+
+def qualityConfigDir = "$project.rootDir/config/quality"
+def reportsDir = "$project.buildDir/reports"
+
+configurations {
+    ktlint
+    detekt
+}
+
+dependencies {
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
+
+    ktlint 'com.github.shyiko:ktlint:0.29.0'
+    ktlint fileTree(dir: "$qualityConfigDir/ktlint/libs", include: ['*.jar'])
+
+    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.RC9.2'
+}
+
+check.dependsOn 'checkstyle', 'pmd', 'ktlint', 'detekt'
+
+task checkstyle(type: Checkstyle, group: 'Verification') {
+    description = 'Check Java code style.'
+    configFile = file("$qualityConfigDir/checkstyle/checkstyle-config.xml")
+
+    source 'src'
+    include '**/*.java'
+
+    reports {
+        xml {
+            enabled = true
+            destination file("$reportsDir/checkstyle/checkstyle.xml")
+        }
+        html {
+            enabled = false
+            destination file("$reportsDir/checkstyle/checkstyle.html")
+        }
+    }
+
+    classpath = files()
+}
+
+task pmd(type: Pmd, group: 'Verification') {
+    description = 'Check Java for bugs.'
+    ruleSetFiles = files("$qualityConfigDir/pmd/pmd-ruleset.xml",
+            "$qualityConfigDir/pmd/pmd-test-ruleset.xml")
+    ignoreFailures = false
+    ruleSets = []
+    consoleOutput = true
+
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+
+    reports {
+        xml {
+            enabled = true
+            destination file("$reportsDir/pmd/pmd.xml")
+        }
+        html {
+            enabled = false
+            destination file("$reportsDir/pmd/pmd.html")
+        }
+    }
+}
+
+task ktlint(type: JavaExec, group: 'verification') {
+    description = 'Check Kotlin code style.'
+    classpath = configurations.ktlint
+    main = 'com.github.shyiko.ktlint.Main'
+    args 'src/**/*.kt'
+    args '--reporter=plain', "--reporter=checkstyle,output=${reportsDir}/ktlint/ktlint.xml"
+    args '--verbose'
+}
+
+task ktlintFormat(type: JavaExec, group: 'formatting') {
+    description = 'Fix Kotlin code style deviations.'
+    classpath = configurations.ktlint
+    main = 'com.github.shyiko.ktlint.Main'
+    args "-F", "src/**/*.kt"
+}
+
+task detekt(type: JavaExec, group: 'verification') {
+    description = 'Check Kotlin for code smells.'
+    classpath = configurations.detekt
+    main = 'io.gitlab.arturbosch.detekt.cli.Main'
+    args '-i', "$projectDir"
+    args '-c', "$qualityConfigDir/detekt/detekt-config.yml"
+    args '-f', '.*test.*'
+    args '-r', "xml:${reportsDir}/detekt/detekt.xml"
+    args '-r', "html:${reportsDir}/detekt/detekt.html"
+}

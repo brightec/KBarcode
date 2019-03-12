@@ -1,0 +1,98 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-allopen'
+apply from: "$project.rootDir/config/quality/quality.gradle"
+
+allOpen {
+    annotation 'uk.co.brightec.kbarcode.util.OpenClass'
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        lintConfig file("$project.rootDir/config/quality/lint.xml")
+        check 'Interoperability'
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguardTest-rules.pro"
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguardTest-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.google.firebase:firebase-ml-vision:19.0.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.0.0'
+
+    kapt 'androidx.lifecycle:lifecycle-compiler:2.0.0'
+
+    //region Local Unit Tests
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.24.5'
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
+    testImplementation 'androidx.test:runner:1.1.1'
+    testImplementation 'androidx.arch.core:core-testing:2.0.0'
+    //endregion
+
+    //region Instrumented Tests
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'org.mockito:mockito-android:2.24.5'
+    androidTestImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
+    androidTestImplementation 'androidx.arch.core:core-testing:2.0.0'
+    // UI testing with Espresso
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    //endregion
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'KBarcode'
+
+    publishedGroupId = 'uk.co.brightec.kbarcode'
+    libraryName = 'KBarcode'
+    artifact = 'kbarcode'
+
+    libraryDescription = 'A library to help implement barcode scanning'
+
+    siteUrl = 'https://github.com/brightec/KBarcode'
+    gitUrl = 'https://github.com/brightec/KBarcode.git'
+
+    libraryVersion = '0.0.4'
+
+    developerId = 'alistairsykes'
+    developerName = 'Alistair Sykes'
+    developerEmail = 'alistair@brightec.co.uk'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/brightec/KBarcode/blob/master/LICENSE'
+    allLicenses = ["MIT"]
+}
+
+// Turn off javadocs as currently it doesn't work with kotlin
+tasks.withType(Javadoc).all {
+    enabled = false
+}
+
+apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/bintrayv1.gradle'
