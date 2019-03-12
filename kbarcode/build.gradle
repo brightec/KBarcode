@@ -78,7 +78,7 @@ ext {
     siteUrl = 'https://github.com/brightec/KBarcode'
     gitUrl = 'https://github.com/brightec/KBarcode.git'
 
-    libraryVersion = '0.0.4'
+    libraryVersion = '1.0.0'
 
     developerId = 'alistairsykes'
     developerName = 'Alistair Sykes'
