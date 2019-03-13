@@ -7,7 +7,7 @@ A library to help implement barcode scanning.
 <br />
 <br />
 <div align="center">
-  <img width="600" src="LogoLarge.png">
+  <img width="600" src="https://raw.githubusercontent.com/brightec/KBarcode/master/LogoLarge.png">
 </div>
 <br />
 <br />
