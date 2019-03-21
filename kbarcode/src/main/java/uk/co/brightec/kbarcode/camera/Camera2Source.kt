@@ -42,6 +42,12 @@ internal class Camera2Source(
         if (cameraDevice != null) return
 
         val cameraId = selectCamera()
+        if (cameraId == null) {
+            val exception = CameraServiceException()
+            Timber.e(exception, "Error opening camera - No cameraId available")
+            listener?.onCameraFailure(exception)
+            return
+        }
         cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) {
                 cameraDevice = camera
@@ -72,7 +78,8 @@ internal class Camera2Source(
         val characteristics = if (cameraDevice != null) {
             cameraManager.getCameraCharacteristics(cameraDevice.id)
         } else {
-            cameraManager.getCameraCharacteristics(selectCamera())
+            val cameraId = selectCamera() ?: return null
+            cameraManager.getCameraCharacteristics(cameraId)
         }
         val configs = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             ?: throw IllegalStateException() // This key is available on all devices
@@ -92,8 +99,11 @@ internal class Camera2Source(
         return characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)
     }
 
+    @Suppress("ReturnCount") // Better readability
     @VisibleForTesting
-    internal fun selectCamera(): String {
+    internal fun selectCamera(): String? {
+        if (cameraManager.cameraIdList.isEmpty()) return null
+
         for (cameraId in cameraManager.cameraIdList) {
             val characteristics = cameraManager.getCameraCharacteristics(cameraId)
             if (characteristics.get(CameraCharacteristics.LENS_FACING) == requestedFacing) {

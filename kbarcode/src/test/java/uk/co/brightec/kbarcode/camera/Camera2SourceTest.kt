@@ -13,6 +13,7 @@ import android.view.Surface
 import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doNothing
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
@@ -95,6 +96,21 @@ internal class Camera2SourceTest {
         verify(cameraManager, never()).openCamera(
             any(), any(), anyOrNull<Handler>()
         )
+    }
+
+    @Test
+    fun noCameraId__start__error() {
+        // GIVEN
+        doReturn(null).whenever(cameraSource).selectCamera()
+
+        // WHEN
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.start(mock(), listener)
+
+        // THEN
+        val captor = argumentCaptor<CameraException>()
+        verify(listener).onCameraFailure(captor.capture())
+        assertTrue(captor.firstValue is CameraServiceException)
     }
 
     @Test
