@@ -14,6 +14,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import timber.log.Timber
 import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
@@ -51,19 +52,18 @@ class BarcodeView @JvmOverloads constructor(
         }
 
     private val surfaceView = SurfaceView(context)
-    @VisibleForTesting
-    internal var startRequested: Boolean = false
     @ScaleType
     private var previewScaleType: Int = CENTER_INSIDE
         set(value) {
             field = value
             requestLayout()
         }
-    private val surfaceLiveData = SurfaceLiveData()
-    @VisibleForTesting
-    internal val surfaceObserver = Observer<Boolean> { surfaceAvailable ->
-        if (surfaceAvailable && startRequested) {
-            startRequested = false
+    private val surfaceAvailable = MutableLiveData<Boolean>()
+    private val surfaceAvailableObserver = object : Observer<Boolean> {
+        override fun onChanged(available: Boolean) {
+            if (!available) return
+
+            surfaceAvailable.removeObserver(this)
             if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED
             ) {
@@ -100,17 +100,27 @@ class BarcodeView @JvmOverloads constructor(
         }
 
         val surfaceHolder = surfaceView.holder
-        surfaceHolder.addCallback(surfaceLiveData)
+        surfaceHolder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(holder: SurfaceHolder) {
+                surfaceAvailable.value = true
+            }
+
+            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+                surfaceAvailable.value = false
+                release()
+            }
+        })
         barcodeScanner.addSurface(surfaceHolder.surface)
         @Suppress("LeakingThis") // Intentional invocation
         addView(surfaceView)
     }
 
     override fun start() {
-        startRequested = true
         // We remove and add here to ensure the observer gets called even if the value is the same
-        surfaceLiveData.removeObserver(surfaceObserver)
-        surfaceLiveData.observeForever(surfaceObserver)
+        surfaceAvailable.removeObserver(surfaceAvailableObserver)
+        surfaceAvailable.observeForever(surfaceAvailableObserver)
     }
 
     override fun resume() {
@@ -123,7 +133,7 @@ class BarcodeView @JvmOverloads constructor(
 
     override fun release() {
         barcodeScanner.release()
-        surfaceLiveData.removeObserver(surfaceObserver)
+        surfaceAvailable.removeObserver(surfaceAvailableObserver)
     }
 
     override fun setCameraFacing(facing: Int) {
@@ -268,19 +278,6 @@ class BarcodeView @JvmOverloads constructor(
             Configuration.ORIENTATION_LANDSCAPE -> false
             Configuration.ORIENTATION_PORTRAIT -> true
             else -> false
-        }
-    }
-
-    private class SurfaceLiveData : LiveData<Boolean>(), SurfaceHolder.Callback {
-
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            value = true
-        }
-
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
-
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            value = false
         }
     }
 
