@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="uk.co.brightec.kbarcode.app">
 
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <!-- This sample app would require uses to have a camera
+    https://developer.android.com/guide/topics/manifest/uses-feature-element -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name=".Application"
