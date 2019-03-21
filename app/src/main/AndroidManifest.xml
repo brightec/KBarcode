@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="uk.co.brightec.kbarcode.app">
 
-    <!-- This sample app would require uses to have a camera
+    <!-- This sample app would require users to have a camera
     https://developer.android.com/guide/topics/manifest/uses-feature-element -->
     <uses-feature
         android:name="android.hardware.camera"
