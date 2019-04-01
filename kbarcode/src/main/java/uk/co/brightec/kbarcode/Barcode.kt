@@ -4,28 +4,62 @@ import android.graphics.Point
 import android.graphics.Rect
 import androidx.annotation.IntDef
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import uk.co.brightec.kbarcode.model.CalendarEvent
+import uk.co.brightec.kbarcode.model.ContactInfo
+import uk.co.brightec.kbarcode.model.DrivingLicense
+import uk.co.brightec.kbarcode.model.Email
+import uk.co.brightec.kbarcode.model.GeoPoint
+import uk.co.brightec.kbarcode.model.Phone
+import uk.co.brightec.kbarcode.model.Sms
+import uk.co.brightec.kbarcode.model.UrlBookmark
+import uk.co.brightec.kbarcode.model.WiFi
+import uk.co.brightec.kbarcode.model.convert
 import uk.co.brightec.kbarcode.util.OpenForTesting
 
-@Suppress("unused") // API class
+/**
+ * Main data class to represent a barcode
+ *
+ * This class wraps the underlying FirebaseVisionBarcode
+ * https://firebase.google.com/docs/reference/android/com/google/firebase/ml/vision/barcode/FirebaseVisionBarcode
+ */
 @OpenForTesting
-data class Barcode internal constructor(
-    private val fbBarcode: FirebaseVisionBarcode
+data class Barcode(
+    val boundingBox: Rect?,
+    val calendarEvent: CalendarEvent?,
+    val contactInfo: ContactInfo?,
+    val cornerPoints: List<Point>?,
+    val displayValue: String?,
+    val driverLicense: DrivingLicense?,
+    val email: Email?,
+    @BarcodeFormat
+    val format: Int,
+    val geoPoint: GeoPoint?,
+    val phone: Phone?,
+    val rawValue: String?,
+    val sms: Sms?,
+    val url: UrlBookmark?,
+    @BarcodeValueType
+    val valueType: Int,
+    val wifi: WiFi?
 ) {
 
-    val boundingBox: Rect?
-        get() = fbBarcode.boundingBox
-    val cornerPoints: Array<Point>?
-        get() = fbBarcode.cornerPoints
-    val displayValue: String?
-        get() = fbBarcode.displayValue
-    @BarcodeFormat
-    val format: Int
-        get() = fbBarcode.format
-    val rawValue: String?
-        get() = fbBarcode.rawValue
-    @BarcodeValueType
-    val valueType: Int
-        get() = fbBarcode.valueType
+    internal constructor(fbBarcode: FirebaseVisionBarcode) : this(
+        boundingBox = fbBarcode.boundingBox,
+        calendarEvent = fbBarcode.calendarEvent?.convert(),
+        contactInfo = fbBarcode.contactInfo?.convert(),
+        cornerPoints = fbBarcode.cornerPoints?.toList(),
+        displayValue = fbBarcode.displayValue,
+        driverLicense = fbBarcode.driverLicense?.convert(),
+        email = fbBarcode.email?.convert(),
+        format = fbBarcode.format,
+        geoPoint = fbBarcode.geoPoint?.convert(),
+        phone = fbBarcode.phone?.convert(),
+        rawValue = fbBarcode.rawValue,
+        sms = fbBarcode.sms?.convert(),
+        url = fbBarcode.url?.convert(),
+        valueType = fbBarcode.valueType,
+        wifi = fbBarcode.wifi?.convert()
+    )
 
     override fun toString() = displayValue ?: super.toString()
 
