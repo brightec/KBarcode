@@ -58,3 +58,10 @@ class CameraServiceException : CameraException()
  * @see android.hardware.camera2.CameraCaptureSession.StateCallback.onConfigureFailed
  */
 class CameraSessionException : CameraException()
+
+/**
+ * If the camera device is no longer connected or has encountered a fatal error
+ *
+ * @see android.hardware.camera2.CameraDevice.createCaptureSession
+ */
+class CameraAccessException : CameraException()

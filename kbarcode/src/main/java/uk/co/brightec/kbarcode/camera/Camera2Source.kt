@@ -118,33 +118,40 @@ internal class Camera2Source(
         surfaces: List<Surface>,
         listener: OnCameraReadyListener?
     ) {
-        cameraDevice?.createCaptureSession(
-            surfaces, object : CameraCaptureSession.StateCallback() {
-                override fun onConfigured(session: CameraCaptureSession) {
-                    if (cameraDevice == null) return
-                    @Suppress("UnsafeCallOnNullableType")
-                    val builder = cameraDevice!!.createCaptureRequest(
-                        CameraDevice.TEMPLATE_PREVIEW
-                    )
-                    val autoFocus = selectBestAutoFocus()
-                    if (autoFocus != null) {
-                        builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+        try {
+            cameraDevice?.createCaptureSession(
+                surfaces, object : CameraCaptureSession.StateCallback() {
+                    override fun onConfigured(session: CameraCaptureSession) {
+                        if (cameraDevice == null) return
+                        @Suppress("UnsafeCallOnNullableType")
+                        val builder = cameraDevice!!.createCaptureRequest(
+                            CameraDevice.TEMPLATE_PREVIEW
+                        )
+                        val autoFocus = selectBestAutoFocus()
+                        if (autoFocus != null) {
+                            builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+                        }
+                        for (surface in surfaces) {
+                            builder.addTarget(surface)
+                        }
+                        session.setRepeatingRequest(builder.build(), null, null)
                     }
-                    for (surface in surfaces) {
-                        builder.addTarget(surface)
-                    }
-                    session.setRepeatingRequest(builder.build(), null, null)
-                }
 
-                override fun onConfigureFailed(session: CameraCaptureSession) {
-                    release()
-                    val exception = CameraSessionException()
-                    Timber.e(exception, "Error creating camera session")
-                    listener?.onCameraFailure(exception)
-                }
-            },
-            null
-        )
+                    override fun onConfigureFailed(session: CameraCaptureSession) {
+                        release()
+                        val exception = CameraSessionException()
+                        Timber.e(exception, "Error creating camera session")
+                        listener?.onCameraFailure(exception)
+                    }
+                },
+                null
+            )
+        } catch (e: android.hardware.camera2.CameraAccessException) {
+            release()
+            val exception = CameraAccessException()
+            Timber.e(exception, "Error creating camera session")
+            listener?.onCameraFailure(exception)
+        }
     }
 
     /**

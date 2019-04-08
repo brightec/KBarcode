@@ -16,6 +16,7 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doNothing
 import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
@@ -358,6 +359,23 @@ internal class Camera2SourceTest {
         // THEN
         verify(cameraSource).release()
         verify(listener).onCameraFailure(any<CameraSessionException>())
+    }
+
+    @Test
+    fun cameraDevice_configurationException__createCaptureSession__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull()))
+            .doThrow(mock<android.hardware.camera2.CameraAccessException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureSession(surfaces, listener)
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any<CameraAccessException>())
     }
 
     @Test
