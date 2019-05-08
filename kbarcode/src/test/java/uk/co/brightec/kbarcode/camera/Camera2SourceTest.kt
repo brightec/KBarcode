@@ -49,7 +49,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun nothing__isStarted__true() {
+    fun nothing__isStarted__false() {
         // GIVEN
         // nothing
 
