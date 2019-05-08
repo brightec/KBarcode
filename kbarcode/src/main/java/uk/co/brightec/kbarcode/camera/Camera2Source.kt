@@ -21,6 +21,8 @@ internal class Camera2Source(
 
     @VisibleForTesting
     internal var cameraDevice: CameraDevice? = null
+    @VisibleForTesting
+    internal var cameraOpening = false
     var requestedFacing = CameraCharacteristics.LENS_FACING_BACK
 
     constructor(context: Context) : this(
@@ -29,9 +31,12 @@ internal class Camera2Source(
 
     fun isStarted() = cameraDevice != null
 
+    fun isOpening() = cameraOpening
+
     fun release() {
         cameraDevice?.close()
         cameraDevice = null
+        cameraOpening = false
     }
 
     @RequiresPermission(android.Manifest.permission.CAMERA)
@@ -39,7 +44,7 @@ internal class Camera2Source(
         surfaces: List<Surface>,
         listener: OnCameraReadyListener?
     ) {
-        if (cameraDevice != null) return
+        if (cameraDevice != null || cameraOpening) return
 
         val cameraId = selectCamera()
         if (cameraId == null) {
@@ -48,8 +53,10 @@ internal class Camera2Source(
             listener?.onCameraFailure(exception)
             return
         }
+        cameraOpening = true
         cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
             override fun onOpened(camera: CameraDevice) {
+                cameraOpening = false
                 cameraDevice = camera
                 listener?.onCameraReady()
                 createCaptureSession(

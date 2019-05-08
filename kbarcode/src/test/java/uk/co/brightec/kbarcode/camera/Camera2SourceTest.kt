@@ -73,6 +73,30 @@ internal class Camera2SourceTest {
     }
 
     @Test
+    fun nothing__isOpening__false() {
+        // GIVEN
+        // nothing
+
+        // WHEN
+        val result = cameraSource.isOpening()
+
+        // THEN
+        assertFalse(result)
+    }
+
+    @Test
+    fun cameraOpening__isOpening__true() {
+        // GIVEN
+        cameraSource.cameraOpening = true
+
+        // WHEN
+        val result = cameraSource.isOpening()
+
+        // THEN
+        assertTrue(result)
+    }
+
+    @Test
     fun cameraDevice__release__closesCameraDevice() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
@@ -83,12 +107,27 @@ internal class Camera2SourceTest {
         // THEN
         verify(cameraDevice).close()
         assertNull(cameraSource.cameraDevice)
+        assertFalse(cameraSource.cameraOpening)
     }
 
     @Test
     fun cameraDevice__start__doesNothing() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
+
+        // WHEN
+        cameraSource.start(mock(), mock())
+
+        // THEN
+        verify(cameraManager, never()).openCamera(
+            any(), any(), anyOrNull<Handler>()
+        )
+    }
+
+    @Test
+    fun cameraOpening__start__doesNothing() {
+        // GIVEN
+        cameraSource.cameraOpening = true
 
         // WHEN
         cameraSource.start(mock(), mock())
@@ -115,7 +154,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraId__start__opensCamera() {
+    fun cameraId__start__setsOpening_opensCamera() {
         // GIVEN
         val cameraId = "some id"
         doReturn(cameraId).whenever(cameraSource).selectCamera()
@@ -124,13 +163,14 @@ internal class Camera2SourceTest {
         cameraSource.start(mock(), mock())
 
         // THEN
+        assertTrue(cameraSource.cameraOpening)
         verify(cameraManager).openCamera(
             eq(cameraId), any(), anyOrNull<Handler>()
         )
     }
 
     @Test
-    fun cameraId_cameraOpened__start__setCameraDevice_callListener_createSession() {
+    fun cameraId_cameraOpened__start__setsNotOpening_setCameraDevice_callListener_createSession() {
         doNothing().whenever(cameraSource).createCaptureSession(any(), any())
 
         // GIVEN
@@ -147,6 +187,7 @@ internal class Camera2SourceTest {
         cameraSource.start(surfaces, listener)
 
         // THEN
+        assertFalse(cameraSource.cameraOpening)
         verify(cameraSource).cameraDevice = cameraDevice
         verify(listener).onCameraReady()
         verify(cameraSource).createCaptureSession(surfaces, listener)

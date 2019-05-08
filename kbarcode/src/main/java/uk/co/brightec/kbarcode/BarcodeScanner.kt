@@ -95,6 +95,10 @@ class BarcodeScanner internal constructor(
             Timber.d("Attempted Camera2Source.start(), which has already been started")
             return
         }
+        if (cameraSource.isOpening()) {
+            Timber.d("Attempted Camera2Source.start(), which is currently opening")
+            return
+        }
 
         frameProcessor.barcodes.observeForever(barcodesObserver)
         startCameraSource()
