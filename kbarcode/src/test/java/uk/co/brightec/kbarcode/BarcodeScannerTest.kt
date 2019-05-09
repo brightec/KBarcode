@@ -155,6 +155,38 @@ internal class BarcodeScannerTest {
     }
 
     @Test
+    fun cameraIsStarted__start__resumeProcessing_doesntAddObserver_doesntStartCameraSource() {
+        doNothing().whenever(barcodeScanner).startCameraSource()
+
+        // GIVEN
+        whenever(cameraSource.isStarted()).thenReturn(true)
+
+        // WHEN
+        barcodeScanner.start()
+
+        // THEN
+        assertFalse(barcodeScanner.pauseProcessing)
+        verify(frameProcessor.barcodes, never()).observeForever(any())
+        verify(barcodeScanner, never()).startCameraSource()
+    }
+
+    @Test
+    fun cameraIsOpening__start__resumeProcessing_doesntAddObserver_doesntStartCameraSource() {
+        doNothing().whenever(barcodeScanner).startCameraSource()
+
+        // GIVEN
+        whenever(cameraSource.isOpening()).thenReturn(true)
+
+        // WHEN
+        barcodeScanner.start()
+
+        // THEN
+        assertFalse(barcodeScanner.pauseProcessing)
+        verify(frameProcessor.barcodes, never()).observeForever(any())
+        verify(barcodeScanner, never()).startCameraSource()
+    }
+
+    @Test
     fun processingResumed__resume__resumeProcessing() {
         // GIVEN
         barcodeScanner.pauseProcessing = false
