@@ -17,14 +17,14 @@ import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 
 internal class BarcodeProcessorSingle(
     private val firebaseVision: FirebaseVision = FirebaseVision.getInstance(),
-    formats: Array<Int> = arrayOf(
+    formats: IntArray = intArrayOf(
         Barcode.FORMAT_EAN_13,
         Barcode.FORMAT_EAN_8
     ),
     var barcodesSort: Comparator<Barcode>? = null
 ) : VisionImageProcessorSingleBase<List<FirebaseVisionBarcode>>() {
 
-    var formats: Array<Int> = formats
+    var formats: IntArray = formats
         set(value) {
             field = value
             detector = createDetector()

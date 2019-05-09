@@ -288,7 +288,7 @@ internal class BarcodeScannerTest {
         // nothing
 
         // WHEN
-        val formats = arrayOf(-1, -2)
+        val formats = intArrayOf(-1, -2)
         barcodeScanner.setBarcodeFormats(formats)
 
         // THEN
@@ -743,7 +743,7 @@ internal class BarcodeScannerTest {
     @Test
     fun oneFormat__minWidthForBarcodes__isCorrect() {
         // GIVEN
-        val formats = arrayOf(Barcode.FORMAT_PDF417)
+        val formats = intArrayOf(Barcode.FORMAT_PDF417)
         whenever(frameProcessor.formats).thenReturn(formats)
 
         // WHEN
@@ -757,7 +757,7 @@ internal class BarcodeScannerTest {
     @Test
     fun formats__minWidthForBarcodes__usesMaxFormat() {
         // GIVEN
-        val formats = arrayOf(Barcode.FORMAT_PDF417, Barcode.FORMAT_EAN_8)
+        val formats = intArrayOf(Barcode.FORMAT_PDF417, Barcode.FORMAT_EAN_8)
         whenever(frameProcessor.formats).thenReturn(formats)
 
         // WHEN

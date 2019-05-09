@@ -27,7 +27,7 @@ internal class KBarcodeScannerTest {
         // GIVEN
         val options = mock<Options> {
             on { cameraFacing } doReturn -1
-            on { barcodeFormats } doReturn arrayOf(1, 2, 3)
+            on { barcodeFormats } doReturn intArrayOf(1, 2, 3)
             on { minBarcodeWidth } doReturn -2
             on { barcodesSort } doReturn mock()
             on { scaleType } doReturn -3
@@ -63,6 +63,8 @@ internal class KBarcodeScannerTest {
         override fun release() {}
 
         override fun setCameraFacing(facing: Int) {}
+
+        override fun setBarcodeFormats(formats: IntArray) {}
 
         override fun setBarcodeFormats(formats: Array<Int>) {}
 

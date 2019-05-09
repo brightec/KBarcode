@@ -34,6 +34,18 @@ class KBarcode {
 
         fun setCameraFacing(facing: Int)
 
+        fun setBarcodeFormats(formats: IntArray)
+
+        @Suppress("ArrayPrimitive") // Method is deprecated
+        @Deprecated(
+            message = "More efficient to use an array of primitives",
+            replaceWith = ReplaceWith(
+                expression = "setBarcodeFormats(\n" +
+                        "// Consider using an IntArray\n" +
+                        "formats.toIntArray())"
+            ),
+            level = DeprecationLevel.ERROR
+        )
         fun setBarcodeFormats(formats: Array<Int>)
 
         fun setMinBarcodeWidth(@Px minBarcodeWidth: Int?)

@@ -33,7 +33,7 @@ internal class ProgrammaticActivity : AppCompatActivity(),
             Options.Builder()
                 .cameraFacing(CameraCharacteristics.LENS_FACING_BACK)
                 .barcodeFormats(
-                    arrayOf(
+                    intArrayOf(
                         Barcode.FORMAT_CODABAR, Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,
                         Barcode.FORMAT_ITF, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E
                     )
