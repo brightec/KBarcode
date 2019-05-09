@@ -97,7 +97,7 @@ internal class BarcodeViewTest {
     @Test
     fun formats_setBarcodeFormats_callsBarcodeScanner() {
         // GIVEN
-        val formats = arrayOf(-1, -2)
+        val formats = intArrayOf(-1, -2)
 
         // WHEN
         barcodeView.setBarcodeFormats(formats)

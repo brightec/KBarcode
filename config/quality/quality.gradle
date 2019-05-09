@@ -24,13 +24,17 @@ configurations {
     detekt
 }
 
-dependencies {
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.10.1'
+pmd {
+    toolVersion = '5.8.1'
+}
 
-    ktlint 'com.github.shyiko:ktlint:0.29.0'
+dependencies {
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.18'
+
+    ktlint 'com.github.shyiko:ktlint:0.31.0'
     ktlint fileTree(dir: "$qualityConfigDir/ktlint/libs", include: ['*.jar'])
 
-    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0.RC9.2'
+    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0-RC14'
 }
 
 check.dependsOn 'checkstyle', 'pmd', 'ktlint', 'detekt'

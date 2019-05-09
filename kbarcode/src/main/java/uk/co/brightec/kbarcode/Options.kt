@@ -7,7 +7,7 @@ import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 @Suppress("unused") // API class
 data class Options(
     val cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
-    val barcodeFormats: Array<Int> = arrayOf(Barcode.FORMAT_ALL_FORMATS),
+    val barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
     @Px val minBarcodeWidth: Int? = null,
     val barcodesSort: BarcodeComparator? = null,
     @BarcodeView.ScaleType val scaleType: Int
@@ -15,7 +15,7 @@ data class Options(
 
     class Builder(
         private var cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
-        private var barcodeFormats: Array<Int> = arrayOf(Barcode.FORMAT_ALL_FORMATS),
+        private var barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
         @Px private var minBarcodeWidth: Int? = null,
         private var barcodesSort: BarcodeComparator? = null,
         @BarcodeView.ScaleType private var scaleType: Int = BarcodeView.CENTER_INSIDE
@@ -25,12 +25,26 @@ data class Options(
             this.cameraFacing = cameraFacing
         }
 
-        fun barcodeFormats(barcodeFormats: Array<Int>) = apply {
+        fun barcodeFormats(barcodeFormats: IntArray) = apply {
             this.barcodeFormats = if (barcodeFormats.isEmpty()) {
-                arrayOf(Barcode.FORMAT_ALL_FORMATS)
+                intArrayOf(Barcode.FORMAT_ALL_FORMATS)
             } else {
                 barcodeFormats
             }
+        }
+
+        @Suppress("ArrayPrimitive") // Method is deprecated
+        @Deprecated(
+            message = "More efficient to use an array of primitives",
+            replaceWith = ReplaceWith(
+                expression = "barcodeFormats(\n" +
+                        "// Consider using an IntArray\n" +
+                        "barcodeFormats.toIntArray())"
+            ),
+            level = DeprecationLevel.ERROR
+        )
+        fun barcodeFormats(barcodeFormats: Array<Int>) = apply {
+            barcodeFormats(barcodeFormats.toIntArray())
         }
 
         fun minBarcodeWidth(@Px minBarcodeWidth: Int) = apply {

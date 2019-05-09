@@ -10,7 +10,7 @@
 # Keep annotations
 -keepattributes *Annotation*
 
-#Put in place to ensure crashlytics gets good reports - see https://docs.fabric.io/android/crashlytics/dex-and-proguard.html
+# Put in place to ensure crashlytics gets good reports - see https://docs.fabric.io/android/crashlytics/dex-and-proguard.html
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep class com.crashlytics.** { *; }

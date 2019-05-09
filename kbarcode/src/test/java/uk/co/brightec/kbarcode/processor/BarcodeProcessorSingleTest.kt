@@ -48,7 +48,7 @@ internal class BarcodeProcessorSingleTest {
         // nothing
 
         // WHEN
-        processor.formats = arrayOf(1, 2)
+        processor.formats = intArrayOf(1, 2)
 
         // THEN
         verify(processor).detector = any()

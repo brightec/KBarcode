@@ -15,6 +15,7 @@ import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
 import timber.log.Timber
 
+@Suppress("TooManyFunctions") // This class does still feels single responsibility
 internal class Camera2Source(
     private val cameraManager: CameraManager
 ) {

@@ -105,7 +105,13 @@ class BarcodeView @JvmOverloads constructor(
                 surfaceAvailable.value = true
             }
 
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 surfaceAvailable.value = false
@@ -140,8 +146,13 @@ class BarcodeView @JvmOverloads constructor(
         barcodeScanner.setCameraFacing(facing)
     }
 
-    override fun setBarcodeFormats(formats: Array<Int>) {
+    override fun setBarcodeFormats(formats: IntArray) {
         barcodeScanner.setBarcodeFormats(formats)
+    }
+
+    @Suppress("ArrayPrimitive") // Method is deprecated
+    override fun setBarcodeFormats(formats: Array<Int>) {
+        setBarcodeFormats(formats.toIntArray())
     }
 
     override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
@@ -181,22 +192,22 @@ class BarcodeView @JvmOverloads constructor(
     @Suppress("MagicNumber") // Intended magic number, purpose of method
     @VisibleForTesting
     internal fun formatsAttrConvert(attr: Int) = when (attr) {
-        0 -> arrayOf(Barcode.FORMAT_ALL_FORMATS)
-        1 -> arrayOf(
+        0 -> intArrayOf(Barcode.FORMAT_ALL_FORMATS)
+        1 -> intArrayOf(
             Barcode.FORMAT_CODABAR, Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,
             Barcode.FORMAT_ITF, Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E
         )
-        2 -> arrayOf(
+        2 -> intArrayOf(
             Barcode.FORMAT_CODE_128, Barcode.FORMAT_CODE_39, Barcode.FORMAT_CODE_93
         )
-        3 -> arrayOf(
+        3 -> intArrayOf(
             Barcode.FORMAT_DATA_MATRIX, Barcode.FORMAT_QR_CODE, Barcode.FORMAT_PDF417,
             Barcode.FORMAT_AZTEC
         )
-        4 -> arrayOf(
+        4 -> intArrayOf(
             Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8
         )
-        else -> arrayOf(Barcode.FORMAT_ALL_FORMATS)
+        else -> intArrayOf(Barcode.FORMAT_ALL_FORMATS)
     }
 
     @VisibleForTesting
@@ -273,8 +284,7 @@ class BarcodeView @JvmOverloads constructor(
 
     @VisibleForTesting
     internal fun isPortraitMode(): Boolean {
-        val orientation = resources.configuration.orientation
-        return when (orientation) {
+        return when (resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> false
             Configuration.ORIENTATION_PORTRAIT -> true
             else -> false

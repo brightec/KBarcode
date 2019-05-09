@@ -131,8 +131,13 @@ class BarcodeScanner internal constructor(
         }
     }
 
-    override fun setBarcodeFormats(formats: Array<Int>) {
+    override fun setBarcodeFormats(formats: IntArray) {
         frameProcessor.formats = formats
+    }
+
+    @Suppress("ArrayPrimitive") // Method is deprecated
+    override fun setBarcodeFormats(formats: Array<Int>) {
+        setBarcodeFormats(formats.toIntArray())
     }
 
     override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
