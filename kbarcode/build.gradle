@@ -41,7 +41,7 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.google.firebase:firebase-ml-vision:19.0.3'
+    implementation 'com.google.firebase:firebase-ml-vision:20.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.0.0'
 
     kapt 'androidx.lifecycle:lifecycle-compiler:2.0.0'
@@ -78,7 +78,7 @@ ext {
     siteUrl = 'https://github.com/brightec/KBarcode'
     gitUrl = 'https://github.com/brightec/KBarcode.git'
 
-    libraryVersion = '1.0.2'
+    libraryVersion = '1.0.3'
 
     developerId = 'alistairsykes'
     developerName = 'Alistair Sykes'
