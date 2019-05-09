@@ -12,6 +12,7 @@ import uk.co.brightec.kbarcode.processor.OnBarcodesListener
 
 class KBarcode {
 
+    @Suppress("TooManyFunctions") // This class does still feels single responsibility
     interface Scanner : LifecycleObserver {
 
         var onBarcodesListener: OnBarcodesListener?

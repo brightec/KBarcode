@@ -26,7 +26,7 @@ internal class PointTest {
         val result = point.distanceTo(other)
 
         // THEN
-        assertEquals(2.82842712, result, 0.00000001)
+        assertEquals(2.82_842_712, result, 0.00_000_001)
     }
 
     @Test
@@ -39,7 +39,7 @@ internal class PointTest {
         val result = point.distanceTo(other)
 
         // THEN
-        assertEquals(2.82842712, result, 0.00000001)
+        assertEquals(2.82_842_712, result, 0.00_000_001)
     }
 
     @Test
@@ -52,7 +52,7 @@ internal class PointTest {
         val result = point.distanceTo(other)
 
         // THEN
-        assertEquals(2.82842712, result, 0.00000001)
+        assertEquals(2.82_842_712, result, 0.00_000_001)
     }
 
     @Test
@@ -65,7 +65,7 @@ internal class PointTest {
         val result = point.distanceTo(other)
 
         // THEN
-        assertEquals(2.82842712, result, 0.00000001)
+        assertEquals(2.82_842_712, result, 0.00_000_001)
     }
 
     @Test
@@ -78,6 +78,6 @@ internal class PointTest {
         val result = point.distanceTo(other)
 
         // THEN
-        assertEquals(25.45584412, result, 0.00000001)
+        assertEquals(25.45_584_412, result, 0.00_000_001)
     }
 }

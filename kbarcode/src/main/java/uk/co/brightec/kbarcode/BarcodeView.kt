@@ -105,7 +105,13 @@ class BarcodeView @JvmOverloads constructor(
                 surfaceAvailable.value = true
             }
 
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 surfaceAvailable.value = false
@@ -278,8 +284,7 @@ class BarcodeView @JvmOverloads constructor(
 
     @VisibleForTesting
     internal fun isPortraitMode(): Boolean {
-        val orientation = resources.configuration.orientation
-        return when (orientation) {
+        return when (resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> false
             Configuration.ORIENTATION_PORTRAIT -> true
             else -> false
