@@ -7,13 +7,16 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
-import com.nhaarman.mockitokotlin2.doNothing
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -22,18 +25,27 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 
+@ExperimentalCoroutinesApi
 @SmallTest
 internal class VisionImageProcessorSingleBaseTest {
+
+    private val testScope = TestCoroutineScope()
 
     private lateinit var processor: VisionImageProcessorSingleBaseImpl
 
     @Before
     fun before() {
         processor = spy(VisionImageProcessorSingleBaseImpl())
+        processor.scope = testScope
+    }
+
+    @After
+    fun after() {
+        testScope.cleanupTestCoroutines()
     }
 
     @Test
-    fun isProcessing__process__notProcessed() {
+    fun isProcessing__process__notProcessed() = runBlockingTest {
         // GIVEN
         doReturn(true).whenever(processor).isProcessing()
 
@@ -45,8 +57,8 @@ internal class VisionImageProcessorSingleBaseTest {
     }
 
     @Test
-    fun image__process__callsDetect() {
-        doNothing().whenever(processor).startDetection(any(), any())
+    fun image__process__callsDetect() = runBlockingTest {
+        doReturn(Unit).whenever(processor).startDetection(any(), any())
 
         // GIVEN
         val image = mock<Image>()
@@ -84,7 +96,7 @@ internal class VisionImageProcessorSingleBaseTest {
     }
 
     @Test
-    fun image__startDetection__setsVar_runsDetection() {
+    fun image__startDetection__setsVar_runsDetection() = runBlockingTest {
         // GIVEN
         val image = mock<Image>()
         val frameMetadata = mock<FrameMetadata>()
@@ -101,64 +113,66 @@ internal class VisionImageProcessorSingleBaseTest {
     }
 
     @Test
-    fun image_completeSuccess_listener__startDetection__callsListener_setsVar_onSuccess() {
-        // GIVEN
-        val image = mock<Image>()
-        val frameMetadata = mock<FrameMetadata>()
-        val visionImage = mock<FirebaseVisionImage>()
-        doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
-        val foo = mock<Foo>()
-        val result = mock<Task<Foo>> {
-            on { isSuccessful } doReturn true
-            on { result } doReturn foo
+    fun image_completeSuccess_listener__startDetection__callsListener_setsVar_onSuccess() =
+        runBlockingTest {
+            // GIVEN
+            val image = mock<Image>()
+            val frameMetadata = mock<FrameMetadata>()
+            val visionImage = mock<FirebaseVisionImage>()
+            doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
+            val foo = mock<Foo>()
+            val result = mock<Task<Foo>> {
+                on { isSuccessful } doReturn true
+                on { result } doReturn foo
+            }
+            val task = processor.task
+            doAnswer {
+                val listener = it.getArgument<OnCompleteListener<Foo>>(0)
+                listener.onComplete(result)
+                return@doAnswer task
+            }.whenever(task).addOnCompleteListener(any())
+            val listener = mock<((Image) -> Unit)>()
+            processor.onImageProcessed = listener
+
+            // WHEN
+            processor.startDetection(image, frameMetadata)
+
+            // THEN
+            verify(listener).invoke(image)
+            assertNull(processor.processingImage)
+            verify(processor).onSuccess(foo, frameMetadata)
         }
-        val task = processor.task
-        doAnswer {
-            val listener = it.getArgument<OnCompleteListener<Foo>>(0)
-            listener.onComplete(result)
-            return@doAnswer task
-        }.whenever(task).addOnCompleteListener(any())
-        val listener = mock<((Image) -> Unit)>()
-        processor.onImageProcessed = listener
-
-        // WHEN
-        processor.startDetection(image, frameMetadata)
-
-        // THEN
-        verify(listener).invoke(image)
-        assertNull(processor.processingImage)
-        verify(processor).onSuccess(foo, frameMetadata)
-    }
 
     @Test
-    fun image_completeError_listener__startDetection__callsListener_setsVar_onFailure() {
-        // GIVEN
-        val image = mock<Image>()
-        val frameMetadata = mock<FrameMetadata>()
-        val visionImage = mock<FirebaseVisionImage>()
-        doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
-        val error = mock<Exception>()
-        val result = mock<Task<Foo>> {
-            on { isSuccessful } doReturn false
-            on { exception } doReturn error
+    fun image_completeError_listener__startDetection__callsListener_setsVar_onFailure() =
+        runBlockingTest {
+            // GIVEN
+            val image = mock<Image>()
+            val frameMetadata = mock<FrameMetadata>()
+            val visionImage = mock<FirebaseVisionImage>()
+            doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
+            val error = mock<Exception>()
+            val result = mock<Task<Foo>> {
+                on { isSuccessful } doReturn false
+                on { exception } doReturn error
+            }
+            val task = processor.task
+            doAnswer {
+                val listener = it.getArgument<OnCompleteListener<Foo>>(0)
+                listener.onComplete(result)
+                return@doAnswer task
+            }.whenever(task).addOnCompleteListener(any())
+            val listener = mock<((Image) -> Unit)>()
+            processor.onImageProcessed = listener
+
+            // WHEN
+            processor.startDetection(image, frameMetadata)
+
+            // THEN
+            verify(listener).invoke(image)
+            assertNull(processor.processingImage)
+            verify(processor).onFailure(error)
         }
-        val task = processor.task
-        doAnswer {
-            val listener = it.getArgument<OnCompleteListener<Foo>>(0)
-            listener.onComplete(result)
-            return@doAnswer task
-        }.whenever(task).addOnCompleteListener(any())
-        val listener = mock<((Image) -> Unit)>()
-        processor.onImageProcessed = listener
-
-        // WHEN
-        processor.startDetection(image, frameMetadata)
-
-        // THEN
-        verify(listener).invoke(image)
-        assertNull(processor.processingImage)
-        verify(processor).onFailure(error)
-    }
 
     class Foo
 

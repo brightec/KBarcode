@@ -2,9 +2,16 @@ package uk.co.brightec.kbarcode.processor.base
 
 import android.graphics.Bitmap
 import android.media.Image
+import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import com.google.android.gms.tasks.Task
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 import java.nio.ByteBuffer
 
@@ -14,6 +21,9 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     @VisibleForTesting
     internal var processingImage: Pair<Image, FrameMetadata>? = null
     var onImageProcessed: ((Image) -> Unit)? = null
+
+    @VisibleForTesting
+    internal var scope = CoroutineScope(Job())
 
     override fun process(data: ByteBuffer, frameMetadata: FrameMetadata) {
         throw NotImplementedError("This could be implemented similar to below")
@@ -28,16 +38,21 @@ internal abstract class VisionImageProcessorSingleBase<T> :
         frameMetadata: FrameMetadata
     ) {
         if (!isProcessing()) {
-            startDetection(image, frameMetadata)
+            scope.launch {
+                startDetection(image, frameMetadata)
+            }
         }
     }
 
-    override fun stop() {}
+    @CallSuper
+    override fun stop() {
+        scope.cancel()
+    }
 
     fun isProcessing() = processingImage != null
 
     @VisibleForTesting
-    internal fun startDetection(
+    internal suspend fun startDetection(
         image: Image,
         metadata: FrameMetadata
     ) {
@@ -58,8 +73,10 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     }
 
     @VisibleForTesting
-    internal fun convertToVisionImage(image: Image, frameMetadata: FrameMetadata) =
-        FirebaseVisionImage.fromMediaImage(image, frameMetadata.rotation)
+    internal suspend fun convertToVisionImage(image: Image, frameMetadata: FrameMetadata) =
+        withContext(Dispatchers.Default) {
+            FirebaseVisionImage.fromMediaImage(image, frameMetadata.rotation)
+        }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     internal abstract fun detectInImage(image: FirebaseVisionImage): Task<T>

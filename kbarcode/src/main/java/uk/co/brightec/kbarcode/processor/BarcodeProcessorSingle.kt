@@ -41,6 +41,7 @@ internal class BarcodeProcessorSingle(
         get() = _barcodes
 
     override fun stop() {
+        super.stop()
         detector.close()
     }
 
