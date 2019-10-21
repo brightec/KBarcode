@@ -59,6 +59,15 @@ internal class Camera2Source(
             override fun onOpened(camera: CameraDevice) {
                 cameraOpening = false
                 cameraDevice = camera
+
+                if (surfaces.any { !it.isValid }) {
+                    release()
+                    val exception = CameraException()
+                    Timber.e(exception, "Surfaces no longer valid")
+                    listener?.onCameraFailure(exception)
+                    return
+                }
+
                 listener?.onCameraReady()
                 createCaptureSession(
                     surfaces = surfaces,
