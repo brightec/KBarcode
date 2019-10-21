@@ -9,8 +9,8 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 import java.nio.ByteBuffer
@@ -19,11 +19,12 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     VisionImageProcessorSingle {
 
     @VisibleForTesting
-    internal var processingImage: Pair<Image, FrameMetadata>? = null
+    internal var processingImage: Image? = null
     var onImageProcessed: ((Image) -> Unit)? = null
 
+    private var currentJob: Job? = null
     @VisibleForTesting
-    internal var scope = CoroutineScope(Job())
+    internal var scope = CoroutineScope(Dispatchers.Main)
 
     override fun process(data: ByteBuffer, frameMetadata: FrameMetadata) {
         throw NotImplementedError("This could be implemented similar to below")
@@ -38,15 +39,21 @@ internal abstract class VisionImageProcessorSingleBase<T> :
         frameMetadata: FrameMetadata
     ) {
         if (!isProcessing()) {
-            scope.launch {
+            processingImage = image
+            currentJob = scope.launch {
                 startDetection(image, frameMetadata)
+                processingImage = null
             }
         }
     }
 
     @CallSuper
     override fun stop() {
-        scope.cancel()
+        currentJob?.cancel()
+        processingImage?.let {
+            onImageProcessed?.invoke(it)
+            processingImage = null
+        }
     }
 
     fun isProcessing() = processingImage != null
@@ -56,23 +63,20 @@ internal abstract class VisionImageProcessorSingleBase<T> :
         image: Image,
         metadata: FrameMetadata
     ) {
-        processingImage = image to metadata
-        val fbImage = convertToVisionImage(image, metadata)
-        detectInImage(fbImage)
-            .addOnCompleteListener { task ->
-                @Suppress("UnsafeCallOnNullableType")
-                onImageProcessed?.invoke(processingImage!!.first)
-                processingImage = null
-                if (task.isSuccessful && task.result != null) {
-                    @Suppress("UnsafeCallOnNullableType")
-                    onSuccess(task.result!!, metadata)
-                } else {
-                    onFailure(task.exception ?: Exception("Unknown"))
-                }
-            }
+        @Suppress("TooGenericExceptionCaught") // As specific as we can be with Firebase
+        try {
+            val fbImage = convertToVisionImage(image, metadata)
+            val result = detectInImage(fbImage).await()
+            onSuccess(result, metadata)
+        } catch (e: Exception) {
+            onFailure(e)
+        } finally {
+            onImageProcessed?.invoke(image)
+        }
     }
 
     @VisibleForTesting
+    @Throws(IllegalStateException::class)
     internal suspend fun convertToVisionImage(image: Image, frameMetadata: FrameMetadata) =
         withContext(Dispatchers.Default) {
             FirebaseVisionImage.fromMediaImage(image, frameMetadata.rotation)
