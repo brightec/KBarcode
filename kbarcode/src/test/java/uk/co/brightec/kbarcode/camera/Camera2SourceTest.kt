@@ -170,6 +170,32 @@ internal class Camera2SourceTest {
     }
 
     @Test
+    fun cameraId_cameraOpened_sufacesInvalid__start__setsNotOpening_setCameraDevice_error() {
+        doNothing().whenever(cameraSource).createCaptureSession(any(), any())
+
+        // GIVEN
+        val cameraId = "some id"
+        doReturn(cameraId).whenever(cameraSource).selectCamera()
+        whenever(cameraManager.openCamera(any(), any(), anyOrNull<Handler>())).then {
+            val stateCallback = it.getArgument<CameraDevice.StateCallback>(1)
+            stateCallback.onOpened(cameraDevice)
+        }
+
+        // THEN
+        val surface = mock<Surface> {
+            on { isValid } doReturn false
+        }
+        val surfaces = listOf(surface)
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.start(surfaces, listener)
+
+        // THEN
+        assertFalse(cameraSource.cameraOpening)
+        verify(cameraSource).cameraDevice = cameraDevice
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
     fun cameraId_cameraOpened__start__setsNotOpening_setCameraDevice_callListener_createSession() {
         doNothing().whenever(cameraSource).createCaptureSession(any(), any())
 
@@ -182,7 +208,10 @@ internal class Camera2SourceTest {
         }
 
         // THEN
-        val surfaces = mock<List<Surface>>()
+        val surface = mock<Surface> {
+            on { isValid } doReturn true
+        }
+        val surfaces = listOf(surface)
         val listener = mock<OnCameraReadyListener>()
         cameraSource.start(surfaces, listener)
 
