@@ -43,6 +43,7 @@ internal class BarcodeProcessorSingle(
     override fun stop() {
         super.stop()
         detector.close()
+        _barcodes.value = emptyList()
     }
 
     override fun detectInImage(image: FirebaseVisionImage): Task<List<FirebaseVisionBarcode>> =
