@@ -18,20 +18,18 @@ references:
       command: |
         wget --no-check-certificate ${KEYSTORE_URL} -O app.keystore -q
 
-  install_android_sdk:
-    description: Install Android SDK
-    steps:
-    - run:
-        command: |
-          echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-          echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-          echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
-          echo 'export PATH="$PATH:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools"' >> $BASH_ENV
-          HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
-          HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
-          yes | sdkmanager --licenses && yes | sdkmanager --update
-          sdkmanager "tools" "platform-tools"
-        name: Install Android SDK
+  install_android_sdk: &install_android_sdk
+    run:
+      name: Install Android SDK
+      command: |
+        echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+        echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+        echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
+        echo 'export PATH="$PATH:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools"' >> $BASH_ENV
+        HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
+        HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
+        yes | sdkmanager --licenses && yes | sdkmanager --update
+        sdkmanager "tools" "platform-tools"
 
   check_halt: &check_halt
     run:
@@ -53,32 +51,32 @@ jobs:
     <<: *setup_config
     steps:
       - run:
-          name: Get last build SHA1
-          command: |
-            HTTP_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
-              --request GET \
-              "https://api.keyvalue.xyz/$LAST_BUILD_TOKEN/$CIRCLE_PROJECT_REPONAME")
-            LAST_BUILD=$(echo $HTTP_LAST_BUILD | sed -e 's/HTTPSTATUS\:.*//g')
-            STATUS_LAST_BUILD=$(echo $HTTP_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-            if [ $STATUS_LAST_BUILD != 200 ]; then
-              echo -e "Fetching key value for last build failed.\nStatus: $STATUS_LAST_BUILD"
-              echo "See https://github.com/kvaas/docs/blob/master/REST%20API.md for help"
-              exit 1
-            else
-              echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
-            fi
-      - run:
-          name: Save current SHA1
-          command: |
-            HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
-              --request POST \
-              "https://api.keyvalue.xyz/$LAST_BUILD_TOKEN/$CIRCLE_PROJECT_REPONAME/$CIRCLE_SHA1")
-              STATUS_SAVE_LAST_BUILD=$(echo $HTTP_SAVE_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-            if [ $STATUS_SAVE_LAST_BUILD != 200 ]; then
-              echo -e "Saving key value for last build failed.\nStatus: $STATUS_SAVE_LAST_BUILD"
-              echo "See https://github.com/kvaas/docs/blob/master/REST%20API.md for help"
-              exit 1
-            fi
+        command: |
+          HTTP_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+            --request GET \
+            "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN")
+          LAST_BUILD=$(echo $HTTP_LAST_BUILD | sed -e 's/HTTPSTATUS\:.*//g')
+          STATUS_LAST_BUILD=$(echo $HTTP_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          if [ $STATUS_LAST_BUILD != 200 ]; then
+            echo -e "Fetching key value for last build failed.\nStatus: $STATUS_LAST_BUILD"
+            echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
+            exit 1
+          else
+            echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
+          fi
+        name: Get last build SHA1
+    - run:
+        command: |
+          HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+            --request POST \
+            "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN/$CIRCLE_SHA1")
+            STATUS_SAVE_LAST_BUILD=$(echo $HTTP_SAVE_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          if [ $STATUS_SAVE_LAST_BUILD != 200 ]; then
+            echo -e "Saving key value for last build failed.\nStatus: $STATUS_SAVE_LAST_BUILD"
+            echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
+            exit 1
+          fi
+        name: Save current SHA1
       - checkout
       - run:
           name: Check if deployment is required
