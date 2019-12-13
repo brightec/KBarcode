@@ -10,11 +10,11 @@ allOpen {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -81,7 +81,7 @@ ext {
     siteUrl = 'https://github.com/brightec/KBarcode'
     gitUrl = 'https://github.com/brightec/KBarcode.git'
 
-    libraryVersion = '1.0.5'
+    libraryVersion = '1.0.6'
 
     developerId = 'alistairsykes'
     developerName = 'Alistair Sykes'
