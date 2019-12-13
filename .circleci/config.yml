@@ -18,6 +18,21 @@ references:
       command: |
         wget --no-check-certificate ${KEYSTORE_URL} -O app.keystore -q
 
+  install_android_sdk:
+    description: Install Android SDK
+    steps:
+    - run:
+        command: |
+          echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+          echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+          echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
+          echo 'export PATH="$PATH:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools"' >> $BASH_ENV
+          HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
+          HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
+          yes | sdkmanager --licenses && yes | sdkmanager --update
+          sdkmanager "tools" "platform-tools"
+        name: Install Android SDK
+
   check_halt: &check_halt
     run:
       name: Checking whether to halt this job
@@ -84,6 +99,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - *check_halt
+      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
@@ -136,6 +152,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - *check_halt
+      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
@@ -170,6 +187,7 @@ jobs:
   dist_release:
     <<: *setup_config
     steps:
+      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
