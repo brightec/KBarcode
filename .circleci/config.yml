@@ -65,7 +65,7 @@ jobs:
             echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
           fi
         name: Get last build SHA1
-    - run:
+      - run:
         command: |
           HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
             --request POST \
