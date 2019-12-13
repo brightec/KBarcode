@@ -170,7 +170,6 @@ jobs:
   dist_release:
     <<: *setup_config
     steps:
-      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
