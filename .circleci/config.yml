@@ -7,7 +7,7 @@ references:
   setup_config: &setup_config
     working_directory: *workspace
     docker:
-      - image: circleci/android:api-28-node8-alpha
+      - image: circleci/android:api-29-node
     environment:
       JVM_OPTS: -Xmx3200m
       KEYSTORE_PATH: ../app.keystore
@@ -17,19 +17,6 @@ references:
       name: Download Keystores
       command: |
         wget --no-check-certificate ${KEYSTORE_URL} -O app.keystore -q
-
-  install_android_sdk: &install_android_sdk
-    run:
-      name: Install Android SDK
-      command: |
-        echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-        echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
-        echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
-        echo 'export PATH="$PATH:${ANDROID_HOME}/emulator:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools"' >> $BASH_ENV
-        HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
-        HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
-        yes | sdkmanager --licenses && yes | sdkmanager --update
-        sdkmanager "tools" "platform-tools"
 
   check_halt: &check_halt
     run:
@@ -97,7 +84,6 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - *check_halt
-      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
@@ -150,7 +136,6 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - *check_halt
-      - *install_android_sdk
       - checkout
       - *download_google_services
       - run:
