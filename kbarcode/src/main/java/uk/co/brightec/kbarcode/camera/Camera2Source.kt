@@ -51,8 +51,9 @@ internal class Camera2Source(
         if (cameraId == null) {
             val message = "Error opening camera - No cameraId available"
             val exception = CameraServiceException(message)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener, message = message, exception = exception
+            )
             return
         }
         cameraOpening = true
@@ -63,11 +64,11 @@ internal class Camera2Source(
                     cameraDevice = camera
 
                     if (surfaces.any { !it.isValid }) {
-                        release()
                         val message = "Surfaces no longer valid"
                         val exception = CameraException(message)
-                        Timber.e(exception, message)
-                        listener?.onCameraFailure(exception)
+                        releaseCameraAndReportException(
+                            listener = listener, message = message, exception = exception
+                        )
                         return
                     }
 
@@ -83,31 +84,33 @@ internal class Camera2Source(
                 }
 
                 override fun onError(camera: CameraDevice, error: Int) {
-                    release()
                     val exception = createExceptionFromCameraDeviceError(error)
-                    Timber.e(exception, "Error opening camera")
-                    listener?.onCameraFailure(exception)
+                    releaseCameraAndReportException(
+                        listener = listener,
+                        message = "Error opening camera",
+                        exception = exception
+                    )
                 }
             }, null)
         } catch (e: android.hardware.camera2.CameraAccessException) {
-            release()
-            val message = "Camera is disabled by device policy, has been disconnected, or is " +
-                    "being used by a higher-priority camera API client."
-            val exception = CameraAccessException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener,
+                message = "Camera is disabled by device policy, has been disconnected, or is " +
+                        "being used by a higher-priority camera API client.",
+                cause = e
+            )
         } catch (e: IllegalArgumentException) {
-            release()
-            val message = "CameraId does not match any camera device"
-            val exception = CameraException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener,
+                message = "CameraId does not match any camera device",
+                cause = e
+            )
         } catch (e: SecurityException) {
-            release()
-            val message = "Application does not have permission to access the camera"
-            val exception = CameraException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener,
+                message = "Application does not have permission to access the camera",
+                cause = e
+            )
         }
     }
 
@@ -163,49 +166,104 @@ internal class Camera2Source(
                 surfaces, object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
                         if (cameraDevice == null) return
-                        @Suppress("UnsafeCallOnNullableType")
-                        val builder = cameraDevice!!.createCaptureRequest(
-                            CameraDevice.TEMPLATE_PREVIEW
+
+                        createCaptureRequest(
+                            surfaces = surfaces, listener = listener, session = session
                         )
-                        val autoFocus = selectBestAutoFocus()
-                        if (autoFocus != null) {
-                            builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
-                        }
-                        for (surface in surfaces) {
-                            builder.addTarget(surface)
-                        }
-                        session.setRepeatingRequest(builder.build(), null, null)
                     }
 
                     override fun onConfigureFailed(session: CameraCaptureSession) {
-                        release()
-                        val message = "Error creating camera session"
-                        val exception = CameraSessionException(message)
-                        Timber.e(exception, message)
-                        listener?.onCameraFailure(exception)
+                        releaseCameraAndReportException(
+                            listener = listener, message = "Error creating camera session",
+                            exception = CameraSessionException()
+                        )
                     }
                 },
                 null
             )
         } catch (e: android.hardware.camera2.CameraAccessException) {
-            release()
-            val message = "Error creating camera session"
-            val exception = CameraAccessException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener, message = "Error creating camera session", cause = e
+            )
         } catch (e: IllegalArgumentException) {
-            release()
-            val message = "Error creating camera session: Surfaces do not meet the requirements"
-            val exception = CameraException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener, message = "Surfaces do not meet the requirements", cause = e
+            )
         } catch (e: IllegalStateException) {
-            release()
-            val message = "Error creating camera session: Camera device has been closed"
-            val exception = CameraException(message, e)
-            Timber.e(exception, message)
-            listener?.onCameraFailure(exception)
+            releaseCameraAndReportException(
+                listener = listener, message = "Camera device has been closed", cause = e
+            )
         }
+    }
+
+    @VisibleForTesting
+    internal fun createCaptureRequest(
+        surfaces: List<Surface>,
+        listener: OnCameraReadyListener?,
+        session: CameraCaptureSession
+    ) {
+        try {
+            @Suppress("UnsafeCallOnNullableType")
+            val builder = try {
+                cameraDevice!!.createCaptureRequest(
+                    CameraDevice.TEMPLATE_PREVIEW
+                )
+            } catch (e: IllegalArgumentException) {
+                releaseCameraAndReportException(
+                    listener = listener, message = "TemplateType is not supported by this device.",
+                    cause = e
+                )
+                return
+            }
+            val autoFocus = selectBestAutoFocus()
+            if (autoFocus != null) {
+                builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+            }
+            for (surface in surfaces) {
+                builder.addTarget(surface)
+            }
+            session.setRepeatingRequest(builder.build(), null, null)
+        } catch (e: android.hardware.camera2.CameraAccessException) {
+            releaseCameraAndReportException(
+                listener = listener, message = "Error creating capture request", cause = e
+            )
+        } catch (e: IllegalStateException) {
+            releaseCameraAndReportException(
+                listener = listener, message = "Camera device has been closed", cause = e
+            )
+        } catch (e: IllegalArgumentException) {
+            releaseCameraAndReportException(
+                listener = listener, message = "Surfaces do not meet the requirements", cause = e
+            )
+        }
+    }
+
+    private fun releaseCameraAndReportException(
+        listener: OnCameraReadyListener?,
+        message: String? = null,
+        cause: Throwable? = null
+    ) {
+        release()
+        val exception = when (cause) {
+            is android.hardware.camera2.CameraAccessException ->
+                CameraAccessException(message, cause)
+            is CameraSessionException ->
+                CameraSessionException(message, cause)
+            else ->
+                CameraException(message, cause)
+        }
+        Timber.e(exception, message)
+        listener?.onCameraFailure(exception)
+    }
+
+    private fun releaseCameraAndReportException(
+        listener: OnCameraReadyListener?,
+        message: String? = null,
+        exception: CameraException
+    ) {
+        release()
+        Timber.e(exception, message)
+        listener?.onCameraFailure(exception)
     }
 
     /**
