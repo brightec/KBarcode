@@ -163,18 +163,10 @@ internal class Camera2Source(
                 surfaces, object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
                         if (cameraDevice == null) return
-                        @Suppress("UnsafeCallOnNullableType")
-                        val builder = cameraDevice!!.createCaptureRequest(
-                            CameraDevice.TEMPLATE_PREVIEW
+
+                        createCaptureRequest(
+                            surfaces = surfaces, listener = listener, session = session
                         )
-                        val autoFocus = selectBestAutoFocus()
-                        if (autoFocus != null) {
-                            builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
-                        }
-                        for (surface in surfaces) {
-                            builder.addTarget(surface)
-                        }
-                        session.setRepeatingRequest(builder.build(), null, null)
                     }
 
                     override fun onConfigureFailed(session: CameraCaptureSession) {
@@ -195,13 +187,62 @@ internal class Camera2Source(
             listener?.onCameraFailure(exception)
         } catch (e: IllegalArgumentException) {
             release()
-            val message = "Error creating camera session: Surfaces do not meet the requirements"
+            val message = "Surfaces do not meet the requirements"
             val exception = CameraException(message, e)
             Timber.e(exception, message)
             listener?.onCameraFailure(exception)
         } catch (e: IllegalStateException) {
             release()
-            val message = "Error creating camera session: Camera device has been closed"
+            val message = "Camera device has been closed"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        }
+    }
+
+    @VisibleForTesting
+    internal fun createCaptureRequest(
+        surfaces: List<Surface>,
+        listener: OnCameraReadyListener?,
+        session: CameraCaptureSession
+    ) {
+        try {
+            @Suppress("UnsafeCallOnNullableType")
+            val builder = try {
+                cameraDevice!!.createCaptureRequest(
+                    CameraDevice.TEMPLATE_PREVIEW
+                )
+            } catch (e: IllegalArgumentException) {
+                release()
+                val message = "TemplateType is not supported by this device."
+                val exception = CameraException(message, e)
+                Timber.e(exception, message)
+                listener?.onCameraFailure(exception)
+                return
+            }
+            val autoFocus = selectBestAutoFocus()
+            if (autoFocus != null) {
+                builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+            }
+            for (surface in surfaces) {
+                builder.addTarget(surface)
+            }
+            session.setRepeatingRequest(builder.build(), null, null)
+        } catch (e: android.hardware.camera2.CameraAccessException) {
+            release()
+            val message = "Error creating capture request"
+            val exception = CameraAccessException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: IllegalStateException) {
+            release()
+            val message = "Camera device has been closed"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: IllegalArgumentException) {
+            release()
+            val message = "Surfaces do not meet the requirements"
             val exception = CameraException(message, e)
             Timber.e(exception, message)
             listener?.onCameraFailure(exception)

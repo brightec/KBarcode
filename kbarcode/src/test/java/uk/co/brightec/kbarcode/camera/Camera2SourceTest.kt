@@ -384,31 +384,22 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_configured_autoFocus__createCaptureSession__setsRepeatingRequest() {
+    fun cameraDevice_configured__createCaptureSession__createCaptureRequest() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
-        val captureRequest = mock<CaptureRequest>()
-        val captureRequestBuilder = mock<CaptureRequest.Builder> {
-            on { build() } doReturn captureRequest
-        }
-        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
         val session = mock<CameraCaptureSession>()
         whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull())).then {
             val stateCallback = it.getArgument<CameraCaptureSession.StateCallback>(1)
             stateCallback.onConfigured(session)
         }
-        val autoFocus = 1
-        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
 
         // WHEN
         val surfaces = listOf<Surface>(mock(), mock())
-        cameraSource.createCaptureSession(surfaces, mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureSession(surfaces, listener)
 
         // THEN
-        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
-        verify(captureRequestBuilder).addTarget(surfaces[0])
-        verify(captureRequestBuilder).addTarget(surfaces[1])
-        verify(session).setRepeatingRequest(captureRequest, null, null)
+        verify(cameraSource).createCaptureRequest(surfaces, listener, session)
     }
 
     @Test
@@ -432,7 +423,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_configurationException__createCaptureSession__release_callsListener() {
+    fun cameraDevice_cameraAccessException__createCaptureSession__release_callsListener() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
         whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull()))
@@ -446,6 +437,213 @@ internal class Camera2SourceTest {
         // THEN
         verify(cameraSource).release()
         verify(listener).onCameraFailure(any<CameraAccessException>())
+    }
+
+    @Test
+    fun cameraDevice_illegalArgumentException__createCaptureSession__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull()))
+            .doThrow(mock<IllegalArgumentException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureSession(surfaces, listener)
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
+    fun cameraDevice_illegalStateException__createCaptureSession__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull()))
+            .doThrow(mock<IllegalStateException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureSession(surfaces, listener)
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
+    fun cameraDevice_session_autoFocus__createCaptureRequest__setsRepeatingRequest() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val session = mock<CameraCaptureSession>()
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        val autoFocus = 1
+        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = mock(), session = session
+        )
+
+        // THEN
+        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+        verify(captureRequestBuilder).addTarget(surfaces[0])
+        verify(captureRequestBuilder).addTarget(surfaces[1])
+        verify(session).setRepeatingRequest(captureRequest, null, null)
+    }
+
+    @Test
+    fun cameraDevice_session_captureIllegalArgExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val session = mock<CameraCaptureSession>()
+        whenever(cameraDevice.createCaptureRequest(any()))
+            .doThrow(mock<IllegalArgumentException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
+    fun cameraDevice_session_captureCameraAccessExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val session = mock<CameraCaptureSession>()
+        whenever(cameraDevice.createCaptureRequest(any()))
+            .doThrow(mock<android.hardware.camera2.CameraAccessException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any<CameraAccessException>())
+    }
+
+    @Test
+    fun cameraDevice_session_captureIllegalStateExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val session = mock<CameraCaptureSession>()
+        whenever(cameraDevice.createCaptureRequest(any()))
+            .doThrow(mock<IllegalStateException>())
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
+    fun cameraDevice_session_requestCameraAccessExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val autoFocus = 1
+        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
+        val session = mock<CameraCaptureSession> {
+            on {
+                setRepeatingRequest(any(), anyOrNull(), anyOrNull())
+            } doThrow mock<android.hardware.camera2.CameraAccessException>()
+        }
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any<CameraAccessException>())
+    }
+
+    @Test
+    fun cameraDevice_session_requestIllegalArgExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val autoFocus = 1
+        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
+        val session = mock<CameraCaptureSession> {
+            on {
+                setRepeatingRequest(any(), anyOrNull(), anyOrNull())
+            } doThrow mock<IllegalArgumentException>()
+        }
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
+    }
+
+    @Test
+    fun cameraDevice_session_requestIllegalStateExc__createCaptureRequest__release_callsListener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val autoFocus = 1
+        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
+        val session = mock<CameraCaptureSession> {
+            on {
+                setRepeatingRequest(any(), anyOrNull(), anyOrNull())
+            } doThrow mock<IllegalStateException>()
+        }
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+
+        // WHEN
+        val surfaces = listOf<Surface>(mock(), mock())
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createCaptureRequest(
+            surfaces = surfaces, listener = listener, session = session
+        )
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
     }
 
     @Test
