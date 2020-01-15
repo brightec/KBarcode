@@ -3,7 +3,10 @@ package uk.co.brightec.kbarcode.camera
 /**
  * An exception relating to the camera device.
  */
-open class CameraException : IllegalStateException()
+open class CameraException(
+    message: String? = null,
+    cause: Throwable? = null
+) : IllegalStateException(message, cause)
 
 /**
  * The camera device is in use already.
@@ -13,7 +16,10 @@ open class CameraException : IllegalStateException()
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_IN_USE
  */
-class CameraInUseException : CameraException()
+class CameraInUseException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * The camera device could not be opened because there are too many other open camera devices.
@@ -24,14 +30,20 @@ class CameraInUseException : CameraException()
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE
  */
-class MaxCamerasInUseException : CameraException()
+class MaxCamerasInUseException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * The camera device could not be opened due to a device policy.
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_DISABLED
  */
-class CameraDisabledException : CameraException()
+class CameraDisabledException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * The camera device has encountered a fatal error.
@@ -40,7 +52,10 @@ class CameraDisabledException : CameraException()
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_DEVICE
  */
-class CameraDeviceException : CameraException()
+class CameraDeviceException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * The camera service has encountered a fatal error.
@@ -50,18 +65,27 @@ class CameraDeviceException : CameraException()
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_SERVICE
  */
-class CameraServiceException : CameraException()
+class CameraServiceException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * This can happen if too many outputs are requested at once
  *
  * @see android.hardware.camera2.CameraCaptureSession.StateCallback.onConfigureFailed
  */
-class CameraSessionException : CameraException()
+class CameraSessionException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
 
 /**
  * If the camera device is no longer connected or has encountered a fatal error
  *
  * @see android.hardware.camera2.CameraDevice.createCaptureSession
  */
-class CameraAccessException : CameraException()
+class CameraAccessException(
+    message: String? = null,
+    cause: Throwable? = null
+) : CameraException(message, cause)
