@@ -49,8 +49,9 @@ internal class Camera2Source(
 
         val cameraId = selectCamera()
         if (cameraId == null) {
-            val exception = CameraServiceException()
-            Timber.e(exception, "Error opening camera - No cameraId available")
+            val message = "Error opening camera - No cameraId available"
+            val exception = CameraServiceException(message)
+            Timber.e(exception, message)
             listener?.onCameraFailure(exception)
             return
         }
@@ -62,8 +63,9 @@ internal class Camera2Source(
 
                 if (surfaces.any { !it.isValid }) {
                     release()
-                    val exception = CameraException()
-                    Timber.e(exception, "Surfaces no longer valid")
+                    val message = "Surfaces no longer valid"
+                    val exception = CameraException(message)
+                    Timber.e(exception, message)
                     listener?.onCameraFailure(exception)
                     return
                 }
@@ -156,8 +158,9 @@ internal class Camera2Source(
 
                     override fun onConfigureFailed(session: CameraCaptureSession) {
                         release()
-                        val exception = CameraSessionException()
-                        Timber.e(exception, "Error creating camera session")
+                        val message = "Error creating camera session"
+                        val exception = CameraSessionException(message)
+                        Timber.e(exception, message)
                         listener?.onCameraFailure(exception)
                     }
                 },
@@ -165,8 +168,21 @@ internal class Camera2Source(
             )
         } catch (e: android.hardware.camera2.CameraAccessException) {
             release()
-            val exception = CameraAccessException()
-            Timber.e(exception, "Error creating camera session")
+            val message = "Error creating camera session"
+            val exception = CameraAccessException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: IllegalArgumentException) {
+            release()
+            val message = "Error creating camera session: Surfaces do not meet the requirements"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: IllegalStateException) {
+            release()
+            val message = "Error creating camera session: Camera device has been closed"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
             listener?.onCameraFailure(exception)
         }
     }
