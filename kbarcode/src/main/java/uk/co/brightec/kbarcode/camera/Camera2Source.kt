@@ -56,38 +56,59 @@ internal class Camera2Source(
             return
         }
         cameraOpening = true
-        cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
-            override fun onOpened(camera: CameraDevice) {
-                cameraOpening = false
-                cameraDevice = camera
+        try {
+            cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
+                override fun onOpened(camera: CameraDevice) {
+                    cameraOpening = false
+                    cameraDevice = camera
 
-                if (surfaces.any { !it.isValid }) {
-                    release()
-                    val message = "Surfaces no longer valid"
-                    val exception = CameraException(message)
-                    Timber.e(exception, message)
-                    listener?.onCameraFailure(exception)
-                    return
+                    if (surfaces.any { !it.isValid }) {
+                        release()
+                        val message = "Surfaces no longer valid"
+                        val exception = CameraException(message)
+                        Timber.e(exception, message)
+                        listener?.onCameraFailure(exception)
+                        return
+                    }
+
+                    listener?.onCameraReady()
+                    createCaptureSession(
+                        surfaces = surfaces,
+                        listener = listener
+                    )
                 }
 
-                listener?.onCameraReady()
-                createCaptureSession(
-                    surfaces = surfaces,
-                    listener = listener
-                )
-            }
+                override fun onDisconnected(camera: CameraDevice) {
+                    release()
+                }
 
-            override fun onDisconnected(camera: CameraDevice) {
-                release()
-            }
-
-            override fun onError(camera: CameraDevice, error: Int) {
-                release()
-                val exception = createExceptionFromCameraDeviceError(error)
-                Timber.e(exception, "Error opening camera")
-                listener?.onCameraFailure(exception)
-            }
-        }, null)
+                override fun onError(camera: CameraDevice, error: Int) {
+                    release()
+                    val exception = createExceptionFromCameraDeviceError(error)
+                    Timber.e(exception, "Error opening camera")
+                    listener?.onCameraFailure(exception)
+                }
+            }, null)
+        } catch (e: android.hardware.camera2.CameraAccessException) {
+            release()
+            val message = "Camera is disabled by device policy, has been disconnected, or is " +
+                    "being used by a higher-priority camera API client."
+            val exception = CameraAccessException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: IllegalArgumentException) {
+            release()
+            val message = "CameraId does not match any camera device"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        } catch (e: SecurityException) {
+            release()
+            val message = "Application does not have permission to access the camera"
+            val exception = CameraException(message, e)
+            Timber.e(exception, message)
+            listener?.onCameraFailure(exception)
+        }
     }
 
     fun getOutputSize(minWidth: Int): Size? {
