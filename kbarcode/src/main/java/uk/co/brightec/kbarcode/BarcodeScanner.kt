@@ -115,8 +115,8 @@ class BarcodeScanner internal constructor(
     override fun release() {
         frameProcessor.barcodes.removeObserver(barcodesObserver)
         frameProcessor.stop()
-        cameraSource.release()
         imageReader?.close()
+        cameraSource.release()
     }
 
     override fun setCameraFacing(facing: Int) {
