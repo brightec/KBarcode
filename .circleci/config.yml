@@ -38,32 +38,32 @@ jobs:
     <<: *setup_config
     steps:
       - run:
-        command: |
-          HTTP_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
-            --request GET \
-            "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN")
-          LAST_BUILD=$(echo $HTTP_LAST_BUILD | sed -e 's/HTTPSTATUS\:.*//g')
-          STATUS_LAST_BUILD=$(echo $HTTP_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-          if [ $STATUS_LAST_BUILD != 200 ]; then
-            echo -e "Fetching key value for last build failed.\nStatus: $STATUS_LAST_BUILD"
-            echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
-            exit 1
-          else
-            echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
-          fi
-        name: Get last build SHA1
+          name: Get last build SHA1
+          command: |
+            HTTP_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+              --request GET \
+              "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN")
+            LAST_BUILD=$(echo $HTTP_LAST_BUILD | sed -e 's/HTTPSTATUS\:.*//g')
+            STATUS_LAST_BUILD=$(echo $HTTP_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            if [ $STATUS_LAST_BUILD != 200 ]; then
+              echo -e "Fetching key value for last build failed.\nStatus: $STATUS_LAST_BUILD"
+              echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
+              exit 1
+            else
+              echo "export LAST_BUILD=$LAST_BUILD" >> $BASH_ENV
+            fi
       - run:
-        command: |
-          HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
-            --request POST \
-            "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN/$CIRCLE_SHA1")
+          name: Save current SHA1
+          command: |
+            HTTP_SAVE_LAST_BUILD=$(curl --write-out "HTTPSTATUS:%{http_code}" \
+              --request POST \
+              "$URL_BASE_KEYVALUE/$CIRCLE_PROJECT_REPONAME/$LAST_BUILD_TOKEN/$CIRCLE_SHA1")
             STATUS_SAVE_LAST_BUILD=$(echo $HTTP_SAVE_LAST_BUILD | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-          if [ $STATUS_SAVE_LAST_BUILD != 200 ]; then
-            echo -e "Saving key value for last build failed.\nStatus: $STATUS_SAVE_LAST_BUILD"
-            echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
-            exit 1
-          fi
-        name: Save current SHA1
+            if [ $STATUS_SAVE_LAST_BUILD != 200 ]; then
+              echo -e "Saving key value for last build failed.\nStatus: $STATUS_SAVE_LAST_BUILD"
+              echo "See https://github.com/brightec/KeyValueApi/blob/master/README.md for help"
+              exit 1
+            fi
       - checkout
       - run:
           name: Check if deployment is required
