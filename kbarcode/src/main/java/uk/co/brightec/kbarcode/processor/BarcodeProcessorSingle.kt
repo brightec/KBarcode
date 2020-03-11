@@ -14,7 +14,9 @@ import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 import uk.co.brightec.kbarcode.processor.base.VisionImageProcessorSingleBase
 import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
+import uk.co.brightec.kbarcode.util.OpenForTesting
 
+@OpenForTesting
 internal class BarcodeProcessorSingle(
     private val firebaseVision: FirebaseVision = FirebaseVision.getInstance(),
     formats: IntArray = intArrayOf(

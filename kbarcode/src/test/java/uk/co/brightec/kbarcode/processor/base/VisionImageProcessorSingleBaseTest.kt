@@ -151,21 +151,23 @@ internal class VisionImageProcessorSingleBaseTest {
         verify(listener).invoke(image)
     }
 
-    class Foo
+    private class Foo
 
-    class VisionImageProcessorSingleBaseImpl : VisionImageProcessorSingleBase<Foo>() {
+    private class VisionImageProcessorSingleBaseImpl : VisionImageProcessorSingleBase<Foo>() {
 
         internal val task = mock<Task<Foo>> {
             on { isCanceled } doReturn false
         }
 
-        override fun detectInImage(image: FirebaseVisionImage): Task<Foo> {
-            return task
+        override fun detectInImage(image: FirebaseVisionImage): Task<Foo> = task
+
+        override fun onSuccess(results: Foo, frameMetadata: FrameMetadata) {
+            // no-op
         }
 
-        override fun onSuccess(results: Foo, frameMetadata: FrameMetadata) {}
-
-        override fun onFailure(e: Exception) {}
+        override fun onFailure(e: Exception) {
+            // no-op
+        }
 
         internal fun mockSuccess(foo: Foo) {
             whenever(task.isComplete).doReturn(true)

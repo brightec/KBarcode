@@ -43,4 +43,10 @@
         <exclude name="ShortClassName" />
         <exclude name="VariableNamingConventions" />
     </rule>
+
+    <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+        <properties>
+            <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Constants)"/>
+        </properties>
+    </rule>
 </ruleset>

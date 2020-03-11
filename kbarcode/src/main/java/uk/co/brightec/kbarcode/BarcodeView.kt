@@ -111,6 +111,7 @@ class BarcodeView @JvmOverloads constructor(
                 width: Int,
                 height: Int
             ) {
+                // no-op
             }
 
             override fun surfaceDestroyed(holder: SurfaceHolder) {

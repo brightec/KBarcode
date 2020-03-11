@@ -170,7 +170,9 @@ class BarcodeScanner internal constructor(
         cameraSource.start(
             surfaces = surfaces,
             listener = object : OnCameraReadyListener {
-                override fun onCameraReady() {}
+                override fun onCameraReady() {
+                    // no-op
+                }
 
                 override fun onCameraFailure(e: CameraException) {
                     onCameraErrorListener?.onCameraError(e)

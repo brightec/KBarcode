@@ -44,7 +44,7 @@ internal class KBarcodeScannerTest {
         verify(barcodeScanner).setScaleType(options.scaleType)
     }
 
-    class BarcodeScanner : KBarcode.Scanner {
+    private class BarcodeScanner : KBarcode.Scanner {
 
         override var onBarcodesListener: OnBarcodesListener? = null
         override var onBarcodeListener: OnBarcodeListener? = null
@@ -54,24 +54,45 @@ internal class KBarcodeScannerTest {
             get() = mock()
         override var onCameraErrorListener: OnCameraErrorListener? = null
 
-        override fun start() {}
+        override fun start() {
+            // no-op
+        }
 
-        override fun resume() {}
+        override fun resume() {
+            // no-op
+        }
 
-        override fun pause() {}
+        override fun pause() {
+            // no-op
+        }
 
-        override fun release() {}
+        override fun release() {
+            // no-op
+        }
 
-        override fun setCameraFacing(facing: Int) {}
+        override fun setCameraFacing(facing: Int) {
+            // no-op
+        }
 
-        override fun setBarcodeFormats(formats: IntArray) {}
+        override fun setBarcodeFormats(formats: IntArray) {
+            // no-op
+        }
 
-        override fun setBarcodeFormats(formats: Array<Int>) {}
+        @Suppress("ArrayPrimitive") // Deprecated
+        override fun setBarcodeFormats(formats: Array<Int>) {
+            // no-op
+        }
 
-        override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {}
+        override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
+            // no-op
+        }
 
-        override fun setBarcodesSort(comparator: Comparator<Barcode>?) {}
+        override fun setBarcodesSort(comparator: Comparator<Barcode>?) {
+            // no-op
+        }
 
-        override fun setScaleType(scaleType: Int) {}
+        override fun setScaleType(scaleType: Int) {
+            // no-op
+        }
     }
 }

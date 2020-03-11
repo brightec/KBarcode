@@ -41,16 +41,16 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguard-rules.pro"
-            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguardTest-rules.pro"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
             versionNameSuffix " (DEBUG ${buildTime()})"
         }
 
         release {
             shrinkResources true
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguard-rules.pro"
-            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/proguardTest-rules.pro"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
             versionNameSuffix " (#${getBuildNumber()})"
         }
     }

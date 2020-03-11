@@ -4,6 +4,7 @@
  * - pmd
  * - ktlint
  * - detekt
+ * - XmlChecker
  *
  * These tasks above are added to perform code analysis. They are dependencies of the check task
  * so running check will run all of them.
@@ -22,22 +23,25 @@ def reportsDir = "$project.buildDir/reports"
 configurations {
     ktlint
     detekt
+    xmlchecker
 }
 
 pmd {
-    toolVersion = '5.8.1'
+    toolVersion = '6.20.0'
 }
 
 dependencies {
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.18'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.27'
 
-    ktlint 'com.github.shyiko:ktlint:0.31.0'
+    ktlint 'com.pinterest:ktlint:0.36.0'
     ktlint fileTree(dir: "$qualityConfigDir/ktlint/libs", include: ['*.jar'])
 
-    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.0.0-RC14'
+    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.2.1'
+
+    xmlchecker fileTree(dir: "$qualityConfigDir/xmlchecker/libs", include: ['*.jar'])
 }
 
-check.dependsOn 'checkstyle', 'pmd', 'ktlint', 'detekt'
+check.dependsOn 'checkstyle', 'pmd', 'ktlint', 'detekt', 'xmlchecker'
 
 task checkstyle(type: Checkstyle, group: 'Verification') {
     description = 'Check Java code style.'
@@ -86,17 +90,18 @@ task pmd(type: Pmd, group: 'Verification') {
 
 task ktlint(type: JavaExec, group: 'verification') {
     description = 'Check Kotlin code style.'
+    main = 'com.pinterest.ktlint.Main'
     classpath = configurations.ktlint
-    main = 'com.github.shyiko.ktlint.Main'
     args 'src/**/*.kt'
     args '--reporter=plain', "--reporter=checkstyle,output=${reportsDir}/ktlint/ktlint.xml"
     args '--verbose'
+    args '--disabled_rules=import-ordering'
 }
 
 task ktlintFormat(type: JavaExec, group: 'formatting') {
     description = 'Fix Kotlin code style deviations.'
+    main = 'com.pinterest.ktlint.Main'
     classpath = configurations.ktlint
-    main = 'com.github.shyiko.ktlint.Main'
     args "-F", "src/**/*.kt"
 }
 
@@ -104,9 +109,37 @@ task detekt(type: JavaExec, group: 'verification') {
     description = 'Check Kotlin for code smells.'
     classpath = configurations.detekt
     main = 'io.gitlab.arturbosch.detekt.cli.Main'
-    args '-i', "$projectDir"
-    args '-c', "$qualityConfigDir/detekt/detekt-config.yml"
-    args '-f', '.*test.*'
-    args '-r', "xml:${reportsDir}/detekt/detekt.xml"
-    args '-r', "html:${reportsDir}/detekt/detekt.html"
+    args '--input', "$projectDir"
+    args '--excludes', "**/generated/**,**/build/**"
+    args '--config', "$qualityConfigDir/detekt/detekt-config.yml"
+    args '--report', "xml:${reportsDir}/detekt/detekt.xml"
+    args '--report', "html:${reportsDir}/detekt/detekt.html"
+}
+
+task xmlchecker(type: JavaExec, group: 'verification') {
+    description = 'Check XML for code smells.'
+    classpath = configurations.xmlchecker
+    main = 'uk.co.brightec.xmlcheck.MainKt'
+    args "$projectDir/src/main/res/layout"
+    args '--no-fail-on-empty'
+    args '--exclude', 'ClassMaterialButton,IdNaming'
+}
+
+task lintReleaseOnly(group: 'verification') {
+    if (!hasProperty('android')) return
+
+    if (android.hasProperty('applicationVariants')) {
+        android.applicationVariants.all { variant ->
+            if (variant.name.toLowerCase().contains('release')) {
+                dependsOn tasks.named("lint${variant.name.capitalize()}").get().name
+            }
+        }
+    }
+    if (android.hasProperty('libraryVariants')) {
+        android.libraryVariants.all { variant ->
+            if (variant.name.toLowerCase().contains('release')) {
+                dependsOn tasks.named("lint${variant.name.capitalize()}").get().name
+            }
+        }
+    }
 }
