@@ -19,22 +19,13 @@ commands:
     - run:
         command: ./.circleci/scripts/checksum.sh /tmp/checksum.txt
         name: Generate cache key
-  download_keystores:
-    description: Download the keystore file
+  download_google_services:
+    description: Download google-services.json
     steps:
     - run:
         command: |
-          if [[ -z "${COMMAND_DOWNLOAD_KEYSTORES}" ]]; then
-            mkdir -p $(dirname "$KEYSTORE_PATH")
-            wget --no-check-certificate ${KEYSTORE_URL} -O ${KEYSTORE_PATH} -q
-          else
-            eval "$COMMAND_DOWNLOAD_KEYSTORES"
-          fi
-          if [ $? -eq 1 ]; then
-            echo "Downloading the keystores failed. Exiting."
-            exit 1
-          fi
-        name: Download Keystores
+          echo $GOOGLE_SERVICES | base64 -di > app/google-services.json
+        name: Download google-services.json
 
 jobs:
   nightly_check:
@@ -88,6 +79,7 @@ jobs:
     steps:
     - check_halt
     - checkout
+    - download_google_services
     - checksum
     - restore_cache:
         key: gradle-{{ arch }}-{{ checksum "/tmp/checksum.txt" }}
@@ -132,6 +124,7 @@ jobs:
     steps:
     - check_halt
     - checkout
+    - download_google_services
     - checksum
     - restore_cache:
         key: gradle-{{ arch }}-{{ checksum "/tmp/checksum.txt" }}
@@ -162,6 +155,7 @@ jobs:
     resource_class: medium+
     steps:
     - checkout
+    - download_google_services
     - checksum
     - restore_cache:
         key: gradle-{{ arch }}-{{ checksum "/tmp/checksum.txt" }}
