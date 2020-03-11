@@ -14,7 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.fragment_viewfinder.*
 import uk.co.brightec.kbarcode.app.R
 
@@ -28,7 +28,7 @@ internal class ViewfinderFragment : Fragment() {
         // Set the viewModel if it hasn't already
         // It could be set already in a test
         if (!::viewModel.isInitialized) {
-            viewModel = ViewModelProviders.of(this).get(ViewfinderViewModel::class.java)
+            viewModel = ViewModelProvider(this).get(ViewfinderViewModel::class.java)
         }
     }
 
@@ -44,7 +44,7 @@ internal class ViewfinderFragment : Fragment() {
         lifecycle.addObserver(view_barcode)
 
         viewModel.setData(view_barcode.barcode)
-        viewModel.barcode.observe(this, Observer { resource ->
+        viewModel.barcode.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Success -> {
                     progress.visibility = View.GONE
