@@ -29,6 +29,7 @@ internal class BarcodeProcessorSingle(
             field = value
             detector = createDetector()
         }
+
     @VisibleForTesting
     internal var detector: FirebaseVisionBarcodeDetector = createDetector()
         set(value) {
@@ -59,9 +60,10 @@ internal class BarcodeProcessorSingle(
             if (resultSort is BarcodeComparator) {
                 resultSort.frameMetadata = frameMetadata
             }
-            barcodes.sortedWith(resultSort)
+            _barcodes.value = barcodes.sortedWith(resultSort)
+        } else {
+            _barcodes.value = barcodes
         }
-        _barcodes.value = barcodes
     }
 
     override fun onFailure(e: Exception) {
