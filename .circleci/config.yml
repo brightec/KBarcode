@@ -190,9 +190,9 @@ workflows:
   checks:
     jobs:
     - tests:
-        context: Android-Tests
+        context: Android
     - tests_android:
-        context: Android-Tests
+        context: Android
         requires:
         - tests
     when: << pipeline.parameters.run_checks >>
@@ -204,11 +204,11 @@ workflows:
     jobs:
     - nightly_check
     - tests:
-        context: Android-Tests
+        context: Android
         requires:
         - nightly_check
     - tests_android:
-        context: Android-Tests
+        context: Android
         requires:
         - tests
     triggers:
