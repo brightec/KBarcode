@@ -17,7 +17,8 @@ import uk.co.brightec.kbarcode.util.OpenForTesting
  *   @see BarcodeScanner.getRotationCompensation
  *   @see FirebaseVisionImageMetadata
  * @property cameraFacing
- *   The direction the camera is facing. Optional because not all devices report this value.
+ *   The direction the camera is facing. Optional because some devices fail to report this value
+ *   reliably every time, but usually expected to be present.
  *   @see CameraCharacteristics.LENS_FACING
  */
 @OpenForTesting
