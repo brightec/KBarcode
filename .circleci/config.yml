@@ -26,6 +26,10 @@ commands:
         command: |
           echo $GOOGLE_SERVICES | base64 -di > app/google-services.json
         name: Download google-services.json
+  load_gpg_key:
+    description: Loads the Base64 encoded GPG key into a file
+    steps:
+      - run: echo $GPG_KEY_CONTENTS | base64 -d > $SIGNING_SECRET_KEY_RING_FILE
 
 jobs:
   nightly_check:
@@ -156,6 +160,7 @@ jobs:
     steps:
     - checkout
     - download_google_services
+    - load_gpg_key
     - checksum
     - restore_cache:
         key: gradle-{{ arch }}-{{ checksum "/tmp/checksum.txt" }}
@@ -167,9 +172,11 @@ jobs:
             - ~/.gradle
         key: gradle-{{ arch }}-{{ checksum "/tmp/checksum.txt" }}
     - run:
-        name: Assemble library and distibute
+        name: Assemble library and distribute
         command: |
-          eval "$COMMAND_CREATE_LIB_DIST_RELEASE"
+          ./gradlew kbarcode:assembleRelease
+          ./gradlew kbarcode:androidSourcesJar
+          ./gradlew kbarcode:publishReleasePublicationToMavenCentralRepository
     - store_artifacts:
         path: kbarcode/build/outputs/aar
         destination: apk

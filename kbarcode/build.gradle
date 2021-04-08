@@ -77,27 +77,24 @@ dependencies {
 }
 
 ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'KBarcode'
+    publishGroupId = 'uk.co.brightec.kbarcode'
+    publishArtifactId = 'kbarcode'
+    publishVersion = '1.2.2'
 
-    publishedGroupId = 'uk.co.brightec.kbarcode'
     libraryName = 'KBarcode'
-    artifact = 'kbarcode'
-
     libraryDescription = 'A library to help implement barcode scanning'
-
-    siteUrl = 'https://github.com/brightec/KBarcode'
-    gitUrl = 'https://github.com/brightec/KBarcode.git'
-
-    libraryVersion = '1.2.2'
+    libraryUrl = 'https://github.com/brightec/KBarcode'
 
     developerId = 'alistairsykes'
     developerName = 'Alistair Sykes'
     developerEmail = 'alistair@brightec.co.uk'
 
+    scmConnection = 'scm:git:github.com/brightec/KBarcode.git'
+    scmDeveloperConnection = 'scm:git:ssh://github.com/brightec/KBarcode.git'
+    scmUrl = 'https://github.com/brightec/KBarcode/tree/master'
+
     licenseName = 'MIT'
     licenseUrl = 'https://github.com/brightec/KBarcode/blob/master/LICENSE'
-    allLicenses = ["MIT"]
 }
 
 // Turn off javadocs as currently it doesn't work with kotlin
@@ -105,5 +102,4 @@ tasks.withType(Javadoc).all {
     enabled = false
 }
 
-apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/brightec/JCenter/master/bintrayv1.gradle'
+apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
