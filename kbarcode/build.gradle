@@ -79,7 +79,7 @@ dependencies {
 ext {
     publishGroupId = 'uk.co.brightec.kbarcode'
     publishArtifactId = 'kbarcode'
-    publishVersion = '1.2.2'
+    publishVersion = '1.2.3'
 
     libraryName = 'KBarcode'
     libraryDescription = 'A library to help implement barcode scanning'
