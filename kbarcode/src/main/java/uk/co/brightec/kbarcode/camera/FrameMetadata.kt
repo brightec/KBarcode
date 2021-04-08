@@ -1,3 +1,4 @@
+@file:Suppress("UnusedImports") // Used in javadoc
 package uk.co.brightec.kbarcode.camera
 
 import android.hardware.camera2.CameraCharacteristics
