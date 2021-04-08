@@ -198,9 +198,7 @@ class BarcodeScanner internal constructor(
                 width = it.width,
                 height = it.height,
                 rotation = getRotationCompensation(),
-                cameraFacing = cameraSource.getCameraFacing() ?: throw IllegalStateException(
-                    "Processing image without camera facing"
-                )
+                cameraFacing = cameraSource.getCameraFacing()
             )
             frameProcessor.process(image, frameMetadata)
         }, null)
