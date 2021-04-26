@@ -209,23 +209,6 @@ workflows:
     jobs:
     - dist_library
     when: << pipeline.parameters.run_deploy_library >>
-  nightly:
-    jobs:
-    - nightly_check
-    - tests:
-        context: Android
-        requires:
-        - nightly_check
-    - tests_android:
-        context: Android
-        requires:
-        - tests
-    triggers:
-    - schedule:
-        cron: 0 18 * * 1-5
-        filters:
-          branches:
-            only: master
   release:
     jobs:
     - dist_library:
