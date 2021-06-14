@@ -1,25 +1,25 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-allopen'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-allopen"
 apply from: "$project.rootDir/config/quality/quality.gradle"
 
 allOpen {
-    annotation 'uk.co.brightec.kbarcode.util.OpenClass'
+    annotation "uk.co.brightec.kbarcode.util.OpenClass"
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     lintOptions {
         lintConfig file("$project.rootDir/config/quality/lint.xml")
-        check 'Interoperability'
+        check "Interoperability"
     }
 
     compileOptions {
@@ -34,70 +34,71 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
-            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile("proguard-android.txt"), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
         }
 
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
-            testProguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "$project.rootDir/config/misc/proguard-rules.pro", "$project.rootDir/proguard-rules.pro"
+            testProguardFiles getDefaultProguardFile("proguard-android.txt"), "$project.rootDir/config/misc/proguardTest-rules.pro", "$project.rootDir/proguardTest-rules.pro"
         }
     }
 }
 
 dependencies {
+    def version_coroutines = "1.4.3"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.4'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
-    implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
-    implementation 'com.google.firebase:firebase-ml-vision-barcode-model:16.0.2'
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.2.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version_coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$version_coroutines"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
+    implementation "com.google.firebase:firebase-ml-vision:24.0.1"
+    implementation "com.google.firebase:firebase-ml-vision-barcode-model:16.0.2"
+    implementation "com.jakewharton.timber:timber:4.7.1"
 
     //region Local Unit Tests
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.mockito:mockito-core:3.1.0'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'androidx.test:runner:1.2.0'
-    testImplementation 'androidx.arch.core:core-testing:2.1.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.4'
+    testImplementation "junit:junit:4.13"
+    testImplementation "org.mockito:mockito-core:3.10.0"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
+    testImplementation "androidx.test:runner:1.2.0"
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version_coroutines"
     //endregion
 
     //region Instrumented Tests
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'org.mockito:mockito-android:3.1.0'
-    androidTestImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
+    androidTestImplementation "androidx.test.ext:junit:1.1.1"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "org.mockito:mockito-android:3.10.0"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
     // UI testing with Espresso
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
     //endregion
 }
 
 ext {
-    publishGroupId = 'uk.co.brightec.kbarcode'
-    publishArtifactId = 'kbarcode'
-    publishVersion = '1.2.3'
+    publishGroupId = "uk.co.brightec.kbarcode"
+    publishArtifactId = "kbarcode"
+    publishVersion = "1.2.3"
 
-    libraryName = 'KBarcode'
-    libraryDescription = 'A library to help implement barcode scanning'
-    libraryUrl = 'https://github.com/brightec/KBarcode'
+    libraryName = "KBarcode"
+    libraryDescription = "A library to help implement barcode scanning"
+    libraryUrl = "https://github.com/brightec/KBarcode"
 
-    developerId = 'alistairsykes'
-    developerName = 'Alistair Sykes'
-    developerEmail = 'alistair@brightec.co.uk'
+    developerId = "alistairsykes"
+    developerName = "Alistair Sykes"
+    developerEmail = "alistair@brightec.co.uk"
 
-    scmConnection = 'scm:git:github.com/brightec/KBarcode.git'
-    scmDeveloperConnection = 'scm:git:ssh://github.com/brightec/KBarcode.git'
-    scmUrl = 'https://github.com/brightec/KBarcode/tree/master'
+    scmConnection = "scm:git:github.com/brightec/KBarcode.git"
+    scmDeveloperConnection = "scm:git:ssh://github.com/brightec/KBarcode.git"
+    scmUrl = "https://github.com/brightec/KBarcode/tree/master"
 
-    licenseName = 'MIT'
-    licenseUrl = 'https://github.com/brightec/KBarcode/blob/master/LICENSE'
+    licenseName = "MIT"
+    licenseUrl = "https://github.com/brightec/KBarcode/blob/master/LICENSE"
 }
 
-// Turn off javadocs as currently it doesn't work with kotlin
+// Turn off javadocs as currently it doesn"t work with kotlin
 tasks.withType(Javadoc).all {
     enabled = false
 }

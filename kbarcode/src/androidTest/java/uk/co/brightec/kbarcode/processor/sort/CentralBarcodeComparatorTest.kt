@@ -2,8 +2,8 @@ package uk.co.brightec.kbarcode.processor.sort
 
 import android.graphics.Rect
 import androidx.test.filters.MediumTest
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

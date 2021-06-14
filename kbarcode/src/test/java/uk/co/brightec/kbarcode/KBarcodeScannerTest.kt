@@ -2,10 +2,10 @@ package uk.co.brightec.kbarcode
 
 import androidx.lifecycle.LiveData
 import androidx.test.filters.SmallTest
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 import org.junit.Before
 import org.junit.Test
 import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
