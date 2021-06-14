@@ -22,6 +22,7 @@ internal class Camera2Source(
 
     @VisibleForTesting
     internal var cameraDevice: CameraDevice? = null
+
     @VisibleForTesting
     internal var cameraOpening = false
     var requestedFacing = CameraCharacteristics.LENS_FACING_BACK
@@ -203,11 +204,16 @@ internal class Camera2Source(
         session: CameraCaptureSession
     ) {
         try {
-            @Suppress("UnsafeCallOnNullableType")
-            val builder = try {
-                cameraDevice!!.createCaptureRequest(
-                    CameraDevice.TEMPLATE_PREVIEW
+            val cameraDevice = this.cameraDevice
+            if (cameraDevice == null) {
+                releaseCameraAndReportException(
+                    listener = listener, message = "Camera device not available.",
+                    cause = NullPointerException()
                 )
+                return
+            }
+            val builder = try {
+                cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             } catch (e: IllegalArgumentException) {
                 releaseCameraAndReportException(
                     listener = listener, message = "TemplateType is not supported by this device.",

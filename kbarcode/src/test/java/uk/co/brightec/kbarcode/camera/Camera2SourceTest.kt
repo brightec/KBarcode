@@ -385,6 +385,9 @@ internal class Camera2SourceTest {
 
     @Test
     fun cameraDevice_configured__createCaptureSession__createCaptureRequest() {
+        // STUB
+        doNothing().whenever(cameraSource).createCaptureRequest(any(), anyOrNull(), any())
+
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
         val session = mock<CameraCaptureSession>()
