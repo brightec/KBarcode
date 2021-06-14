@@ -138,11 +138,6 @@ class BarcodeScanner internal constructor(
         frameProcessor.formats = formats
     }
 
-    @Suppress("ArrayPrimitive") // Method is deprecated
-    override fun setBarcodeFormats(formats: Array<Int>) {
-        setBarcodeFormats(formats.toIntArray())
-    }
-
     override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
         customMinBarcodeWidth = if (minBarcodeWidth ?: -1 < 0) {
             null

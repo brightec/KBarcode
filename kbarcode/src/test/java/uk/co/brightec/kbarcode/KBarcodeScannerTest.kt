@@ -78,11 +78,6 @@ internal class KBarcodeScannerTest {
             // no-op
         }
 
-        @Suppress("ArrayPrimitive") // Deprecated
-        override fun setBarcodeFormats(formats: Array<Int>) {
-            // no-op
-        }
-
         override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
             // no-op
         }

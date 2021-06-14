@@ -33,20 +33,6 @@ data class Options(
             }
         }
 
-        @Suppress("ArrayPrimitive") // Method is deprecated
-        @Deprecated(
-            message = "More efficient to use an array of primitives",
-            replaceWith = ReplaceWith(
-                expression = "barcodeFormats(\n" +
-                        "// Consider using an IntArray\n" +
-                        "barcodeFormats.toIntArray())"
-            ),
-            level = DeprecationLevel.ERROR
-        )
-        fun barcodeFormats(barcodeFormats: Array<Int>) = apply {
-            barcodeFormats(barcodeFormats.toIntArray())
-        }
-
         fun minBarcodeWidth(@Px minBarcodeWidth: Int) = apply {
             this.minBarcodeWidth = minBarcodeWidth
         }

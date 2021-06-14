@@ -151,11 +151,6 @@ class BarcodeView @JvmOverloads constructor(
         barcodeScanner.setBarcodeFormats(formats)
     }
 
-    @Suppress("ArrayPrimitive") // Method is deprecated
-    override fun setBarcodeFormats(formats: Array<Int>) {
-        setBarcodeFormats(formats.toIntArray())
-    }
-
     override fun setMinBarcodeWidth(minBarcodeWidth: Int?) {
         barcodeScanner.setMinBarcodeWidth(minBarcodeWidth)
     }
