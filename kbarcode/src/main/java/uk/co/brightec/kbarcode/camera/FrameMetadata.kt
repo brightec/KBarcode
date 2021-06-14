@@ -2,7 +2,6 @@
 package uk.co.brightec.kbarcode.camera
 
 import android.hardware.camera2.CameraCharacteristics
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import uk.co.brightec.kbarcode.BarcodeScanner
 import uk.co.brightec.kbarcode.util.OpenForTesting
 
@@ -16,7 +15,6 @@ import uk.co.brightec.kbarcode.util.OpenForTesting
  * @property rotation
  *   The rotation relative to the device's current orientation
  *   @see BarcodeScanner.getRotationCompensation
- *   @see FirebaseVisionImageMetadata
  * @property cameraFacing
  *   The direction the camera is facing. Optional because some devices fail to report this value
  *   reliably every time, but usually expected to be present.

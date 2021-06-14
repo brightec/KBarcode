@@ -5,7 +5,7 @@ import android.media.Image
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,6 +23,7 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     var onImageProcessed: ((Image) -> Unit)? = null
 
     private var currentJob: Job? = null
+
     @VisibleForTesting
     internal var scope = CoroutineScope(Dispatchers.Main)
 
@@ -79,11 +80,11 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     @Throws(IllegalStateException::class)
     internal suspend fun convertToVisionImage(image: Image, frameMetadata: FrameMetadata) =
         withContext(Dispatchers.Default) {
-            FirebaseVisionImage.fromMediaImage(image, frameMetadata.rotation)
+            InputImage.fromMediaImage(image, frameMetadata.rotation)
         }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    internal abstract fun detectInImage(image: FirebaseVisionImage): Task<T>
+    internal abstract fun detectInImage(image: InputImage): Task<T>
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     internal abstract fun onSuccess(

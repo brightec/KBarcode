@@ -4,22 +4,20 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.filters.MediumTest
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.common.InputImage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import uk.co.brightec.kbarcode.Barcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 @MediumTest
 internal class BarcodeProcessorSingleTest {
@@ -27,23 +25,20 @@ internal class BarcodeProcessorSingleTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    private lateinit var detector: FirebaseVisionBarcodeDetector
-    private lateinit var firebaseVision: FirebaseVision
+    private lateinit var scanner: BarcodeScanner
 
     private lateinit var processor: BarcodeProcessorSingle
 
     @Before
     fun before() {
-        detector = mock()
-        firebaseVision = mock {
-            on { getVisionBarcodeDetector(any()) } doReturn detector
-        }
+        scanner = mock()
 
-        processor = spy(BarcodeProcessorSingle(firebaseVision = firebaseVision))
+        processor = spy(BarcodeProcessorSingle())
+        doReturn(scanner).whenever(processor).createScanner()
     }
 
     @Test
-    fun nothing__setFormats__setsDetector() {
+    fun nothing__setFormats__setsScanner() {
         // GIVEN
         // nothing
 
@@ -51,23 +46,23 @@ internal class BarcodeProcessorSingleTest {
         processor.formats = intArrayOf(1, 2)
 
         // THEN
-        verify(processor).detector = any()
+        verify(processor).scanner = any()
     }
 
     @Test
-    fun nothing__setDetector__closesPrevious() {
+    fun nothing__setScanner__closesPrevious() {
         // GIVEN
         // nothing
 
         // WHEN
-        processor.detector = mock()
+        processor.scanner = mock()
 
         // THEN
-        verify(detector).close()
+        verify(scanner).close()
     }
 
     @Test
-    fun nothing__stop__closesDetector() {
+    fun nothing__stop__closesScanner() {
         // GIVEN
         // nothing
 
@@ -75,21 +70,21 @@ internal class BarcodeProcessorSingleTest {
         processor.stop()
 
         // THEN
-        verify(detector).close()
+        verify(scanner).close()
     }
 
     @Test
-    fun image__detectInImage__callsDetector() {
-        doReturn(mock<Task<List<FirebaseVisionBarcode>>>()).whenever(detector).detectInImage(any())
+    fun image__detectInImage__callsScanner() {
+        doReturn(mock<Task<List<MlBarcode>>>()).whenever(scanner).process(any())
 
         // GIVEN
-        val image = mock<FirebaseVisionImage>()
+        val image = mock<InputImage>()
 
         // WHEN
         processor.detectInImage(image)
 
         // THEN
-        verify(detector).detectInImage(image)
+        verify(scanner).process(image)
     }
 
     @Test
@@ -100,8 +95,8 @@ internal class BarcodeProcessorSingleTest {
         // WHEN
         val observer = mock<Observer<List<Barcode>>>()
         processor.barcodes.observeForever(observer)
-        val result1 = mock<FirebaseVisionBarcode>()
-        val result2 = mock<FirebaseVisionBarcode>()
+        val result1 = mock<MlBarcode>()
+        val result2 = mock<MlBarcode>()
         val results = listOf(result1, result2)
         processor.onSuccess(results, mock())
 
@@ -118,28 +113,13 @@ internal class BarcodeProcessorSingleTest {
         // WHEN
         val observer = mock<Observer<List<Barcode>>>()
         processor.barcodes.observeForever(observer)
-        val result1 = mock<FirebaseVisionBarcode>()
-        val result2 = mock<FirebaseVisionBarcode>()
+        val result1 = mock<MlBarcode>()
+        val result2 = mock<MlBarcode>()
         val results = listOf(result1, result2)
         processor.onSuccess(results, mock())
 
         // THEN
         verify(comparator).compare(any(), any())
         verify(observer).onChanged(listOf(Barcode(result1), Barcode(result2)))
-    }
-
-    @Test
-    fun formats__createDetector__creates() {
-        reset(firebaseVision) // createDetector called once in init
-        doReturn(detector).whenever(firebaseVision).getVisionBarcodeDetector(any())
-
-        // GIVEN
-        // nothing
-
-        // WHEN
-        processor.createDetector()
-
-        // THEN
-        verify(firebaseVision).getVisionBarcodeDetector(any())
     }
 }

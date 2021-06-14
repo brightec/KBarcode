@@ -1,7 +1,7 @@
 package uk.co.brightec.kbarcode.model
 
 import androidx.annotation.IntDef
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class WiFi(
     @EncryptionType
@@ -10,7 +10,7 @@ data class WiFi(
     val ssid: String?
 ) {
 
-    internal constructor(fbWiFi: FirebaseVisionBarcode.WiFi) : this(
+    internal constructor(fbWiFi: MlBarcode.WiFi) : this(
         encryptionType = fbWiFi.encryptionType,
         password = fbWiFi.password,
         ssid = fbWiFi.ssid
@@ -18,9 +18,9 @@ data class WiFi(
 
     companion object {
 
-        const val TYPE_OPEN = FirebaseVisionBarcode.WiFi.TYPE_OPEN
-        const val TYPE_WEP = FirebaseVisionBarcode.WiFi.TYPE_WEP
-        const val TYPE_WPA = FirebaseVisionBarcode.WiFi.TYPE_WPA
+        const val TYPE_OPEN = MlBarcode.WiFi.TYPE_OPEN
+        const val TYPE_WEP = MlBarcode.WiFi.TYPE_WEP
+        const val TYPE_WPA = MlBarcode.WiFi.TYPE_WPA
 
         @IntDef(
             TYPE_OPEN,
@@ -32,4 +32,4 @@ data class WiFi(
     }
 }
 
-internal fun FirebaseVisionBarcode.WiFi.convert() = WiFi(this)
+internal fun MlBarcode.WiFi.convert() = WiFi(this)

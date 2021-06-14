@@ -1,6 +1,7 @@
 package uk.co.brightec.kbarcode
 
 import android.content.Context
+import android.hardware.camera2.CameraCharacteristics
 import android.media.ImageReader
 import android.util.Size
 import android.view.Surface
@@ -11,7 +12,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import timber.log.Timber
 import uk.co.brightec.kbarcode.camera.Camera2Source
 import uk.co.brightec.kbarcode.camera.CameraException
@@ -44,8 +44,10 @@ class BarcodeScanner internal constructor(
 
     @VisibleForTesting
     internal var pauseProcessing = false
+
     @VisibleForTesting
     internal var imageReader: ImageReader? = null
+
     @VisibleForTesting
     internal val customSurfaces = arrayListOf<Surface>()
     private val barcodesObserver = Observer<List<Barcode>> { barcodes ->
@@ -64,6 +66,7 @@ class BarcodeScanner internal constructor(
             Timber.v("No barcodes found")
         }
     }
+
     @VisibleForTesting
     internal var customMinBarcodeWidth: Int? = null
 
@@ -215,7 +218,7 @@ class BarcodeScanner internal constructor(
      * Get the angle by which an image must be rotated given the device's current
      * orientation.
      *
-     * Source: https://firebase.google.com/docs/ml-kit/android/read-barcodes#2-run-the-barcode-detector
+     * Source: https://developers.google.com/ml-kit/vision/barcode-scanning/android
      */
     @Suppress("MagicNumber", "ReturnCount") // Intentional use of numbers. Returns for readability
     @VisibleForTesting
@@ -224,23 +227,17 @@ class BarcodeScanner internal constructor(
         // Then, from the ORIENTATIONS table, look up the angle the image must be
         // rotated to compensate for the device's rotation.
         val deviceRotation = windowManager.defaultDisplay.rotation
-        var rotationCompensation = ORIENTATIONS[deviceRotation]
-            ?: return FirebaseVisionImageMetadata.ROTATION_0
+        val rotationCompensation = ORIENTATIONS[deviceRotation]!!
 
-        // On most devices, the sensor orientation is 90 degrees, but for some
-        // devices it is 270 degrees. For devices with a sensor orientation of
-        // 270, rotate the image an additional 180 ((270 + 270) % 360) degrees.
-        val sensorOrientation = cameraSource.getCameraSensorOrientation()
-            ?: return FirebaseVisionImageMetadata.ROTATION_0
-        rotationCompensation = (rotationCompensation + sensorOrientation + 270) % 360
+        // Get the device's sensor orientation.
+        val sensorOrientation = cameraSource.getCameraSensorOrientation() ?: 0
 
-        // Return the corresponding FirebaseVisionImageMetadata rotation value.
-        return when (rotationCompensation) {
-            0 -> FirebaseVisionImageMetadata.ROTATION_0
-            90 -> FirebaseVisionImageMetadata.ROTATION_90
-            180 -> FirebaseVisionImageMetadata.ROTATION_180
-            270 -> FirebaseVisionImageMetadata.ROTATION_270
-            else -> FirebaseVisionImageMetadata.ROTATION_0
+        val isFrontFacing =
+            cameraSource.getCameraFacing() == CameraCharacteristics.LENS_FACING_FRONT
+        return if (isFrontFacing) {
+            (sensorOrientation + rotationCompensation) % 360
+        } else { // back-facing
+            (sensorOrientation - rotationCompensation + 360) % 360
         }
     }
 
@@ -255,7 +252,7 @@ class BarcodeScanner internal constructor(
     internal fun minWidthForBarcodes(): Int {
         var minWidth = customMinBarcodeWidth
         if (minWidth == null) {
-            val maxSizedFormat = frameProcessor.formats.maxBy { it.getMinWidth() }
+            val maxSizedFormat = frameProcessor.formats.maxByOrNull { it.getMinWidth() }
             minWidth = maxSizedFormat?.getMinWidth() ?: BARCODE_FORMAT_ALL_MIN_WIDTH
         }
         val minWidthForBarcodes = (minWidth / BARCODE_SCREEN_PROPORTION).toInt()
@@ -269,10 +266,10 @@ class BarcodeScanner internal constructor(
         internal const val BARCODE_SCREEN_PROPORTION = 0.3
         private const val MAX_IMAGES_IN_READER = 3
         private val ORIENTATIONS = HashMap<Int, Int>().apply {
-            this[Surface.ROTATION_0] = 90
-            this[Surface.ROTATION_90] = 0
-            this[Surface.ROTATION_180] = 270
-            this[Surface.ROTATION_270] = 180
+            this[Surface.ROTATION_0] = 0
+            this[Surface.ROTATION_90] = 90
+            this[Surface.ROTATION_180] = 180
+            this[Surface.ROTATION_270] = 270
         }
     }
 }

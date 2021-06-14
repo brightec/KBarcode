@@ -1,6 +1,6 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class PersonName(
     val first: String?,
@@ -12,7 +12,7 @@ data class PersonName(
     val suffix: String?
 ) {
 
-    internal constructor(fbPersonName: FirebaseVisionBarcode.PersonName) : this(
+    internal constructor(fbPersonName: MlBarcode.PersonName) : this(
         first = fbPersonName.first,
         formattedName = fbPersonName.formattedName,
         last = fbPersonName.last,
@@ -23,4 +23,4 @@ data class PersonName(
     )
 }
 
-internal fun FirebaseVisionBarcode.PersonName.convert() = PersonName(this)
+internal fun MlBarcode.PersonName.convert() = PersonName(this)

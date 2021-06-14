@@ -1,7 +1,7 @@
 package uk.co.brightec.kbarcode.model
 
 import androidx.annotation.IntDef
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class Phone(
     val number: String?,
@@ -9,7 +9,7 @@ data class Phone(
     val type: Int
 ) {
 
-    internal constructor(fbPhone: FirebaseVisionBarcode.Phone) : this(
+    internal constructor(fbPhone: MlBarcode.Phone) : this(
         number = fbPhone.number,
         type = fbPhone.type
     )
@@ -17,15 +17,15 @@ data class Phone(
     companion object {
 
         const val TYPE_FAX =
-            FirebaseVisionBarcode.Phone.TYPE_FAX
+            MlBarcode.Phone.TYPE_FAX
         const val TYPE_HOME =
-            FirebaseVisionBarcode.Phone.TYPE_HOME
+            MlBarcode.Phone.TYPE_HOME
         const val TYPE_MOBILE =
-            FirebaseVisionBarcode.Phone.TYPE_MOBILE
+            MlBarcode.Phone.TYPE_MOBILE
         const val TYPE_UNKNOWN =
-            FirebaseVisionBarcode.Phone.TYPE_UNKNOWN
+            MlBarcode.Phone.TYPE_UNKNOWN
         const val TYPE_WORK =
-            FirebaseVisionBarcode.Phone.TYPE_WORK
+            MlBarcode.Phone.TYPE_WORK
 
         @IntDef(
             TYPE_FAX,
@@ -39,4 +39,4 @@ data class Phone(
     }
 }
 
-internal fun FirebaseVisionBarcode.Phone.convert() = Phone(this)
+internal fun MlBarcode.Phone.convert() = Phone(this)

@@ -1,16 +1,16 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class Sms(
     val message: String?,
     val phoneNumber: String?
 ) {
 
-    internal constructor(fbSms: FirebaseVisionBarcode.Sms) : this(
+    internal constructor(fbSms: MlBarcode.Sms) : this(
         message = fbSms.message,
         phoneNumber = fbSms.phoneNumber
     )
 }
 
-internal fun FirebaseVisionBarcode.Sms.convert() = Sms(this)
+internal fun MlBarcode.Sms.convert() = Sms(this)

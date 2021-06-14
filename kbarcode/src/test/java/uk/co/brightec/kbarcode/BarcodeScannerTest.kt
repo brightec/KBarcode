@@ -1,5 +1,6 @@
 package uk.co.brightec.kbarcode
 
+import android.hardware.camera2.CameraCharacteristics
 import android.media.Image
 import android.media.ImageReader
 import android.util.Size
@@ -8,7 +9,6 @@ import android.view.Surface
 import android.view.WindowManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.filters.SmallTest
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
@@ -35,6 +35,7 @@ import uk.co.brightec.kbarcode.camera.OnCameraReadyListener
 import uk.co.brightec.kbarcode.extension.getMinWidth
 import uk.co.brightec.kbarcode.processor.BarcodeProcessorSingle
 
+@Suppress("LargeClass")
 @SmallTest
 internal class BarcodeScannerTest {
 
@@ -485,259 +486,547 @@ internal class BarcodeScannerTest {
     }
 
     @Test
-    fun device0_sensor0__getRotationCompensation__0() {
+    fun device0_sensor0_back__getRotationCompensation__0() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_0
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_0, result)
+        assertEquals(0, result)
     }
 
     @Test
-    fun device0_sensor90__getRotationCompensation__90() {
+    fun device0_sensor90_back__getRotationCompensation__90() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_0
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_90, result)
+        assertEquals(90, result)
     }
 
     @Test
-    fun device0_sensor180__getRotationCompensation__180() {
+    fun device0_sensor180_back__getRotationCompensation__180() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_0
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_180, result)
+        assertEquals(180, result)
     }
 
     @Test
-    fun device0_sensor270__getRotationCompensation__270() {
+    fun device0_sensor270_back__getRotationCompensation__270() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_0
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_270, result)
+        assertEquals(270, result)
     }
 
     @Test
-    fun device90_sensor0__getRotationCompensation__270() {
+    fun device90_sensor0_back__getRotationCompensation__270() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_90
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_270, result)
+        assertEquals(270, result)
     }
 
     @Test
-    fun device90_sensor90__getRotationCompensation__0() {
+    fun device90_sensor90_back__getRotationCompensation__0() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_90
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_0, result)
+        assertEquals(0, result)
     }
 
     @Test
-    fun device90_sensor180__getRotationCompensation__90() {
+    fun device90_sensor180_back__getRotationCompensation__90() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_90
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_90, result)
+        assertEquals(90, result)
     }
 
     @Test
-    fun device90_sensor270__getRotationCompensation__180() {
+    fun device90_sensor270_back__getRotationCompensation__180() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_90
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_180, result)
+        assertEquals(180, result)
     }
 
     @Test
-    fun device180_sensor0__getRotationCompensation__180() {
+    fun device180_sensor0_back__getRotationCompensation__180() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_180
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_180, result)
+        assertEquals(180, result)
     }
 
     @Test
-    fun device180_sensor90__getRotationCompensation__270() {
+    fun device180_sensor90_back__getRotationCompensation__270() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_180
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_270, result)
+        assertEquals(270, result)
     }
 
     @Test
-    fun device180_sensor180__getRotationCompensation__0() {
+    fun device180_sensor180_back__getRotationCompensation__0() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_180
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_0, result)
+        assertEquals(0, result)
     }
 
     @Test
-    fun device180_sensor270__getRotationCompensation__90() {
+    fun device180_sensor270_back__getRotationCompensation__90() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_180
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_90, result)
+        assertEquals(90, result)
     }
 
     @Test
-    fun device270_sensor0__getRotationCompensation__90() {
+    fun device270_sensor0_back__getRotationCompensation__90() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_270
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_90, result)
+        assertEquals(90, result)
     }
 
     @Test
-    fun device270_sensor90__getRotationCompensation__180() {
+    fun device270_sensor90_back__getRotationCompensation__180() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_270
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_180, result)
+        assertEquals(180, result)
     }
 
     @Test
-    fun device270_sensor180__getRotationCompensation__270() {
+    fun device270_sensor180_back__getRotationCompensation__270() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_270
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_270, result)
+        assertEquals(270, result)
     }
 
     @Test
-    fun device270_sensor270__getRotationCompensation__0() {
+    fun device270_sensor270_back__getRotationCompensation__0() {
         // GIVEN
         val display = mock<Display> {
             on { rotation } doReturn Surface.ROTATION_270
         }
         whenever(windowManager.defaultDisplay).thenReturn(display)
         whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_BACK)
 
         // WHEN
         val result = barcodeScanner.getRotationCompensation()
 
         // THEN
-        assertEquals(FirebaseVisionImageMetadata.ROTATION_0, result)
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun device0_sensor0_front__getRotationCompensation__0() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_0
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun device0_sensor90_front__getRotationCompensation__90() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_0
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(90, result)
+    }
+
+    @Test
+    fun device0_sensor180_front__getRotationCompensation__180() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_0
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(180, result)
+    }
+
+    @Test
+    fun device0_sensor270_front__getRotationCompensation__270() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_0
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(270, result)
+    }
+
+    @Test
+    fun device90_sensor0_front__getRotationCompensation__270() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_90
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(90, result)
+    }
+
+    @Test
+    fun device90_sensor90_front__getRotationCompensation__0() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_90
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(180, result)
+    }
+
+    @Test
+    fun device90_sensor180_front__getRotationCompensation__90() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_90
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(270, result)
+    }
+
+    @Test
+    fun device90_sensor270_front__getRotationCompensation__180() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_90
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun device180_sensor0_front__getRotationCompensation__180() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_180
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(180, result)
+    }
+
+    @Test
+    fun device180_sensor90_front__getRotationCompensation__270() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_180
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(270, result)
+    }
+
+    @Test
+    fun device180_sensor180_front__getRotationCompensation__0() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_180
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun device180_sensor270_front__getRotationCompensation__90() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_180
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(90, result)
+    }
+
+    @Test
+    fun device270_sensor0_front__getRotationCompensation__90() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_270
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(0)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(270, result)
+    }
+
+    @Test
+    fun device270_sensor90_front__getRotationCompensation__180() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_270
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(90)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun device270_sensor180_front__getRotationCompensation__270() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_270
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(180)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(90, result)
+    }
+
+    @Test
+    fun device270_sensor270_front__getRotationCompensation__0() {
+        // GIVEN
+        val display = mock<Display> {
+            on { rotation } doReturn Surface.ROTATION_270
+        }
+        whenever(windowManager.defaultDisplay).thenReturn(display)
+        whenever(cameraSource.getCameraSensorOrientation()).thenReturn(270)
+        whenever(cameraSource.getCameraFacing()).thenReturn(CameraCharacteristics.LENS_FACING_FRONT)
+
+        // WHEN
+        val result = barcodeScanner.getRotationCompensation()
+
+        // THEN
+        assertEquals(180, result)
     }
 
     @Test

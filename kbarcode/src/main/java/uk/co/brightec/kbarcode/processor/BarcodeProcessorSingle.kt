@@ -4,36 +4,35 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
 import timber.log.Timber
 import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 import uk.co.brightec.kbarcode.processor.base.VisionImageProcessorSingleBase
 import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 import uk.co.brightec.kbarcode.util.OpenForTesting
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 @OpenForTesting
 internal class BarcodeProcessorSingle(
-    private val firebaseVision: FirebaseVision = FirebaseVision.getInstance(),
     formats: IntArray = intArrayOf(
         Barcode.FORMAT_EAN_13,
         Barcode.FORMAT_EAN_8
     ),
     var barcodesSort: Comparator<Barcode>? = null
-) : VisionImageProcessorSingleBase<List<FirebaseVisionBarcode>>() {
+) : VisionImageProcessorSingleBase<List<MlBarcode>>() {
 
     var formats: IntArray = formats
         set(value) {
             field = value
-            detector = createDetector()
+            scanner = createScanner()
         }
 
     @VisibleForTesting
-    internal var detector: FirebaseVisionBarcodeDetector = createDetector()
+    internal var scanner: BarcodeScanner = createScanner()
         set(value) {
             field.close()
             field = value
@@ -45,15 +44,15 @@ internal class BarcodeProcessorSingle(
 
     override fun stop() {
         super.stop()
-        detector.close()
+        scanner.close()
         _barcodes.value = emptyList()
     }
 
-    override fun detectInImage(image: FirebaseVisionImage): Task<List<FirebaseVisionBarcode>> =
-        detector.detectInImage(image)
+    override fun detectInImage(image: InputImage): Task<List<MlBarcode>> =
+        scanner.process(image)
 
     override fun onSuccess(
-        results: List<FirebaseVisionBarcode>,
+        results: List<MlBarcode>,
         frameMetadata: FrameMetadata
     ) {
         val barcodes = results.map { Barcode(it) }
@@ -73,8 +72,8 @@ internal class BarcodeProcessorSingle(
     }
 
     @VisibleForTesting
-    internal fun createDetector(): FirebaseVisionBarcodeDetector {
-        val options = FirebaseVisionBarcodeDetectorOptions.Builder()
+    internal fun createScanner(): BarcodeScanner {
+        val options = BarcodeScannerOptions.Builder()
         if (formats.size > 1) {
             @Suppress("SpreadOperator") // Required by Firebase API
             options.setBarcodeFormats(
@@ -83,6 +82,6 @@ internal class BarcodeProcessorSingle(
         } else if (formats.size == 1) {
             options.setBarcodeFormats(formats[0])
         }
-        return firebaseVision.getVisionBarcodeDetector(options.build())
+        return BarcodeScanning.getClient(options.build())
     }
 }

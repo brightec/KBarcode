@@ -1,6 +1,6 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class CalendarDateTime(
     val day: Int,
@@ -13,7 +13,7 @@ data class CalendarDateTime(
     val isUtc: Boolean
 ) {
 
-    internal constructor(fbDateTime: FirebaseVisionBarcode.CalendarDateTime) : this(
+    internal constructor(fbDateTime: MlBarcode.CalendarDateTime) : this(
         day = fbDateTime.day,
         hours = fbDateTime.hours,
         minutes = fbDateTime.minutes,
@@ -25,4 +25,4 @@ data class CalendarDateTime(
     )
 }
 
-internal fun FirebaseVisionBarcode.CalendarDateTime.convert() = CalendarDateTime(this)
+internal fun MlBarcode.CalendarDateTime.convert() = CalendarDateTime(this)

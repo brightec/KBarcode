@@ -3,7 +3,6 @@ package uk.co.brightec.kbarcode
 import android.graphics.Point
 import android.graphics.Rect
 import androidx.annotation.IntDef
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import uk.co.brightec.kbarcode.model.CalendarEvent
 import uk.co.brightec.kbarcode.model.ContactInfo
 import uk.co.brightec.kbarcode.model.DrivingLicense
@@ -15,6 +14,7 @@ import uk.co.brightec.kbarcode.model.UrlBookmark
 import uk.co.brightec.kbarcode.model.WiFi
 import uk.co.brightec.kbarcode.model.convert
 import uk.co.brightec.kbarcode.util.OpenForTesting
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 /**
  * Main data class to represent a barcode
@@ -43,7 +43,7 @@ data class Barcode(
     val wifi: WiFi?
 ) {
 
-    internal constructor(fbBarcode: FirebaseVisionBarcode) : this(
+    internal constructor(fbBarcode: MlBarcode) : this(
         boundingBox = fbBarcode.boundingBox,
         calendarEvent = fbBarcode.calendarEvent?.convert(),
         contactInfo = fbBarcode.contactInfo?.convert(),
@@ -65,21 +65,21 @@ data class Barcode(
 
     companion object {
 
-        const val FORMAT_UNKNOWN = FirebaseVisionBarcode.FORMAT_UNKNOWN
-        const val FORMAT_ALL_FORMATS = FirebaseVisionBarcode.FORMAT_ALL_FORMATS
-        const val FORMAT_CODE_128 = FirebaseVisionBarcode.FORMAT_CODE_128
-        const val FORMAT_CODE_39 = FirebaseVisionBarcode.FORMAT_CODE_39
-        const val FORMAT_CODE_93 = FirebaseVisionBarcode.FORMAT_CODE_93
-        const val FORMAT_CODABAR = FirebaseVisionBarcode.FORMAT_CODABAR
-        const val FORMAT_DATA_MATRIX = FirebaseVisionBarcode.FORMAT_DATA_MATRIX
-        const val FORMAT_EAN_13 = FirebaseVisionBarcode.FORMAT_EAN_13
-        const val FORMAT_EAN_8 = FirebaseVisionBarcode.FORMAT_EAN_8
-        const val FORMAT_ITF = FirebaseVisionBarcode.FORMAT_ITF
-        const val FORMAT_QR_CODE = FirebaseVisionBarcode.FORMAT_QR_CODE
-        const val FORMAT_UPC_A = FirebaseVisionBarcode.FORMAT_UPC_A
-        const val FORMAT_UPC_E = FirebaseVisionBarcode.FORMAT_UPC_E
-        const val FORMAT_PDF417 = FirebaseVisionBarcode.FORMAT_PDF417
-        const val FORMAT_AZTEC = FirebaseVisionBarcode.FORMAT_AZTEC
+        const val FORMAT_UNKNOWN = MlBarcode.FORMAT_UNKNOWN
+        const val FORMAT_ALL_FORMATS = MlBarcode.FORMAT_ALL_FORMATS
+        const val FORMAT_CODE_128 = MlBarcode.FORMAT_CODE_128
+        const val FORMAT_CODE_39 = MlBarcode.FORMAT_CODE_39
+        const val FORMAT_CODE_93 = MlBarcode.FORMAT_CODE_93
+        const val FORMAT_CODABAR = MlBarcode.FORMAT_CODABAR
+        const val FORMAT_DATA_MATRIX = MlBarcode.FORMAT_DATA_MATRIX
+        const val FORMAT_EAN_13 = MlBarcode.FORMAT_EAN_13
+        const val FORMAT_EAN_8 = MlBarcode.FORMAT_EAN_8
+        const val FORMAT_ITF = MlBarcode.FORMAT_ITF
+        const val FORMAT_QR_CODE = MlBarcode.FORMAT_QR_CODE
+        const val FORMAT_UPC_A = MlBarcode.FORMAT_UPC_A
+        const val FORMAT_UPC_E = MlBarcode.FORMAT_UPC_E
+        const val FORMAT_PDF417 = MlBarcode.FORMAT_PDF417
+        const val FORMAT_AZTEC = MlBarcode.FORMAT_AZTEC
 
         @IntDef(
             FORMAT_UNKNOWN,
@@ -101,19 +101,19 @@ data class Barcode(
         @Retention(AnnotationRetention.SOURCE)
         annotation class BarcodeFormat
 
-        const val TYPE_UNKNOWN = FirebaseVisionBarcode.TYPE_UNKNOWN
-        const val TYPE_CONTACT_INFO = FirebaseVisionBarcode.TYPE_CONTACT_INFO
-        const val TYPE_EMAIL = FirebaseVisionBarcode.TYPE_EMAIL
-        const val TYPE_ISBN = FirebaseVisionBarcode.TYPE_ISBN
-        const val TYPE_PHONE = FirebaseVisionBarcode.TYPE_PHONE
-        const val TYPE_PRODUCT = FirebaseVisionBarcode.TYPE_PRODUCT
-        const val TYPE_SMS = FirebaseVisionBarcode.TYPE_SMS
-        const val TYPE_TEXT = FirebaseVisionBarcode.TYPE_TEXT
-        const val TYPE_URL = FirebaseVisionBarcode.TYPE_URL
-        const val TYPE_WIFI = FirebaseVisionBarcode.TYPE_WIFI
-        const val TYPE_GEO = FirebaseVisionBarcode.TYPE_GEO
-        const val TYPE_CALENDAR_EVENT = FirebaseVisionBarcode.TYPE_CALENDAR_EVENT
-        const val TYPE_DRIVER_LICENSE = FirebaseVisionBarcode.TYPE_DRIVER_LICENSE
+        const val TYPE_UNKNOWN = MlBarcode.TYPE_UNKNOWN
+        const val TYPE_CONTACT_INFO = MlBarcode.TYPE_CONTACT_INFO
+        const val TYPE_EMAIL = MlBarcode.TYPE_EMAIL
+        const val TYPE_ISBN = MlBarcode.TYPE_ISBN
+        const val TYPE_PHONE = MlBarcode.TYPE_PHONE
+        const val TYPE_PRODUCT = MlBarcode.TYPE_PRODUCT
+        const val TYPE_SMS = MlBarcode.TYPE_SMS
+        const val TYPE_TEXT = MlBarcode.TYPE_TEXT
+        const val TYPE_URL = MlBarcode.TYPE_URL
+        const val TYPE_WIFI = MlBarcode.TYPE_WIFI
+        const val TYPE_GEO = MlBarcode.TYPE_GEO
+        const val TYPE_CALENDAR_EVENT = MlBarcode.TYPE_CALENDAR_EVENT
+        const val TYPE_DRIVER_LICENSE = MlBarcode.TYPE_DRIVER_LICENSE
 
         @IntDef(
             TYPE_UNKNOWN,

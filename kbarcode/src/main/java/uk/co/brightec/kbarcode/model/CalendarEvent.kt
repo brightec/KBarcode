@@ -1,6 +1,6 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class CalendarEvent(
     val description: String?,
@@ -12,7 +12,7 @@ data class CalendarEvent(
     val summary: String?
 ) {
 
-    internal constructor(fbEvent: FirebaseVisionBarcode.CalendarEvent) : this(
+    internal constructor(fbEvent: MlBarcode.CalendarEvent) : this(
         description = fbEvent.description,
         end = fbEvent.end?.convert(),
         location = fbEvent.location,
@@ -23,4 +23,4 @@ data class CalendarEvent(
     )
 }
 
-internal fun FirebaseVisionBarcode.CalendarEvent.convert() = CalendarEvent(this)
+internal fun MlBarcode.CalendarEvent.convert() = CalendarEvent(this)

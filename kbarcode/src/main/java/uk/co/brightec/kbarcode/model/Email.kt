@@ -1,7 +1,7 @@
 package uk.co.brightec.kbarcode.model
 
 import androidx.annotation.IntDef
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class Email(
     val address: String?,
@@ -11,7 +11,7 @@ data class Email(
     val type: Int
 ) {
 
-    internal constructor(fbEmail: FirebaseVisionBarcode.Email) : this(
+    internal constructor(fbEmail: MlBarcode.Email) : this(
         address = fbEmail.address,
         body = fbEmail.body,
         subject = fbEmail.subject,
@@ -21,11 +21,11 @@ data class Email(
     companion object {
 
         const val TYPE_HOME =
-            FirebaseVisionBarcode.Email.TYPE_HOME
+            MlBarcode.Email.TYPE_HOME
         const val TYPE_UNKNOWN =
-            FirebaseVisionBarcode.Email.TYPE_UNKNOWN
+            MlBarcode.Email.TYPE_UNKNOWN
         const val TYPE_WORK =
-            FirebaseVisionBarcode.Email.TYPE_WORK
+            MlBarcode.Email.TYPE_WORK
 
         @IntDef(
             TYPE_HOME,
@@ -37,4 +37,4 @@ data class Email(
     }
 }
 
-internal fun FirebaseVisionBarcode.Email.convert() = Email(this)
+internal fun MlBarcode.Email.convert() = Email(this)

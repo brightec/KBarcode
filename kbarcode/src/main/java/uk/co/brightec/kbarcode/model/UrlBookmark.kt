@@ -1,16 +1,16 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class UrlBookmark(
     val title: String?,
     val url: String?
 ) {
 
-    internal constructor(fbUrlBookmark: FirebaseVisionBarcode.UrlBookmark) : this(
+    internal constructor(fbUrlBookmark: MlBarcode.UrlBookmark) : this(
         title = fbUrlBookmark.title,
         url = fbUrlBookmark.url
     )
 }
 
-internal fun FirebaseVisionBarcode.UrlBookmark.convert() = UrlBookmark(this)
+internal fun MlBarcode.UrlBookmark.convert() = UrlBookmark(this)

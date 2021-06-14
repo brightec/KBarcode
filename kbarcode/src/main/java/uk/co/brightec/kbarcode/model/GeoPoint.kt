@@ -1,16 +1,16 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class GeoPoint(
     val lat: Double,
     val lng: Double
 ) {
 
-    internal constructor(fbGeoPoint: FirebaseVisionBarcode.GeoPoint) : this(
+    internal constructor(fbGeoPoint: MlBarcode.GeoPoint) : this(
         lat = fbGeoPoint.lat,
         lng = fbGeoPoint.lng
     )
 }
 
-internal fun FirebaseVisionBarcode.GeoPoint.convert() = GeoPoint(this)
+internal fun MlBarcode.GeoPoint.convert() = GeoPoint(this)

@@ -1,6 +1,6 @@
 package uk.co.brightec.kbarcode.model
 
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class DrivingLicense(
     val addressCity: String?,
@@ -19,7 +19,7 @@ data class DrivingLicense(
     val middleName: String?
 ) {
 
-    internal constructor(fbDrivingLicense: FirebaseVisionBarcode.DriverLicense) : this(
+    internal constructor(fbDrivingLicense: MlBarcode.DriverLicense) : this(
         addressCity = fbDrivingLicense.addressCity,
         addressState = fbDrivingLicense.addressState,
         addressStreet = fbDrivingLicense.addressStreet,
@@ -37,4 +37,4 @@ data class DrivingLicense(
     )
 }
 
-internal fun FirebaseVisionBarcode.DriverLicense.convert() = DrivingLicense(this)
+internal fun MlBarcode.DriverLicense.convert() = DrivingLicense(this)

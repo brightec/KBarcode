@@ -3,7 +3,7 @@ package uk.co.brightec.kbarcode.processor.base
 import android.media.Image
 import androidx.test.filters.SmallTest
 import com.google.android.gms.tasks.Task
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.mlkit.vision.common.InputImage
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -100,7 +100,7 @@ internal class VisionImageProcessorSingleBaseTest {
         // GIVEN
         val image = mock<Image>()
         val frameMetadata = mock<FrameMetadata>()
-        val visionImage = mock<FirebaseVisionImage>()
+        val visionImage = mock<InputImage>()
         doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
 
         // WHEN
@@ -116,7 +116,7 @@ internal class VisionImageProcessorSingleBaseTest {
             // GIVEN
             val image = mock<Image>()
             val frameMetadata = mock<FrameMetadata>()
-            val visionImage = mock<FirebaseVisionImage>()
+            val visionImage = mock<InputImage>()
             doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
             val foo = mock<Foo>()
             processor.mockSuccess(foo)
@@ -136,7 +136,7 @@ internal class VisionImageProcessorSingleBaseTest {
         // GIVEN
         val image = mock<Image>()
         val frameMetadata = mock<FrameMetadata>()
-        val visionImage = mock<FirebaseVisionImage>()
+        val visionImage = mock<InputImage>()
         doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
         val error = mock<Exception>()
         processor.mockError(error)
@@ -159,7 +159,7 @@ internal class VisionImageProcessorSingleBaseTest {
             on { isCanceled } doReturn false
         }
 
-        override fun detectInImage(image: FirebaseVisionImage): Task<Foo> = task
+        override fun detectInImage(image: InputImage): Task<Foo> = task
 
         override fun onSuccess(results: Foo, frameMetadata: FrameMetadata) {
             // no-op

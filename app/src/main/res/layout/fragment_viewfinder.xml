@@ -32,12 +32,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:src="@drawable/img_viewfinder_black_125dp"
-        android:tint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="@+id/view_barcode"
         app:layout_constraintEnd_toEndOf="@+id/view_barcode"
         app:layout_constraintStart_toStartOf="@+id/view_barcode"
         app:layout_constraintTop_toTopOf="@+id/view_barcode"
         app:layout_constraintWidth_percent="0.4"
+        app:tint="@color/colorPrimary"
         tools:ignore="ContentDescription" />
 
     <ProgressBar

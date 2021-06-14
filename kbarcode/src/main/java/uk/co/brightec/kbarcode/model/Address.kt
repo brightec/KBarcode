@@ -1,7 +1,7 @@
 package uk.co.brightec.kbarcode.model
 
 import androidx.annotation.IntDef
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 data class Address(
     val addressLines: List<String>,
@@ -9,7 +9,7 @@ data class Address(
     val type: Int
 ) {
 
-    internal constructor(fbAddress: FirebaseVisionBarcode.Address) : this(
+    internal constructor(fbAddress: MlBarcode.Address) : this(
         addressLines = fbAddress.addressLines.toList(),
         type = fbAddress.type
     )
@@ -17,11 +17,11 @@ data class Address(
     companion object {
 
         const val TYPE_HOME =
-            FirebaseVisionBarcode.Address.TYPE_HOME
+            MlBarcode.Address.TYPE_HOME
         const val TYPE_UNKNOWN =
-            FirebaseVisionBarcode.Address.TYPE_UNKNOWN
+            MlBarcode.Address.TYPE_UNKNOWN
         const val TYPE_WORK =
-            FirebaseVisionBarcode.Address.TYPE_WORK
+            MlBarcode.Address.TYPE_WORK
 
         @IntDef(
             TYPE_HOME,
