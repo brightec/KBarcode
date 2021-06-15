@@ -1,6 +1,6 @@
 # KBarcode
 
-[![Bintray](https://img.shields.io/badge/dynamic/json.svg?label=latest&query=name&maxAge=86400&color=2A91D0&url=https://bintray.com/api/v1/packages/brightec/maven/KBarcode/versions/_latest)](https://bintray.com/brightec/maven/KBarcode)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/uk.co.brightec.kbarcode/kbarcode/badge.png?style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/uk.co.brightec.kbarcode/kbarcode)
 
 A library to help implement barcode scanning.
 
