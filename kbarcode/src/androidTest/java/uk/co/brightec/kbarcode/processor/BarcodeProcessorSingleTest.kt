@@ -13,6 +13,7 @@ import org.junit.rules.TestRule
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -32,9 +33,11 @@ internal class BarcodeProcessorSingleTest {
     @Before
     fun before() {
         scanner = mock()
-
         processor = spy(BarcodeProcessorSingle())
+        processor.scanner = scanner
         doReturn(scanner).whenever(processor).createScanner()
+
+        reset(processor)
     }
 
     @Test
@@ -75,6 +78,7 @@ internal class BarcodeProcessorSingleTest {
 
     @Test
     fun image__detectInImage__callsScanner() {
+        // STUB
         doReturn(mock<Task<List<MlBarcode>>>()).whenever(scanner).process(any())
 
         // GIVEN
