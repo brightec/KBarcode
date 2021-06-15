@@ -12,14 +12,14 @@ data class ContactInfo(
     val urls: List<String>?
 ) {
 
-    internal constructor(fbEvent: MlBarcode.ContactInfo) : this(
-        addresses = fbEvent.addresses.map { Address(it) },
-        emails = fbEvent.emails.map { Email(it) },
-        name = fbEvent.name?.convert(),
-        organization = fbEvent.organization,
-        phones = fbEvent.phones.map { Phone(it) },
-        title = fbEvent.title,
-        urls = fbEvent.urls.toList()
+    internal constructor(mlEvent: MlBarcode.ContactInfo) : this(
+        addresses = mlEvent.addresses.map { Address(it) },
+        emails = mlEvent.emails.map { Email(it) },
+        name = mlEvent.name?.convert(),
+        organization = mlEvent.organization,
+        phones = mlEvent.phones.map { Phone(it) },
+        title = mlEvent.title,
+        urls = mlEvent.urls.toList()
     )
 }
 

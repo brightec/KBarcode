@@ -13,15 +13,15 @@ data class CalendarDateTime(
     val isUtc: Boolean
 ) {
 
-    internal constructor(fbDateTime: MlBarcode.CalendarDateTime) : this(
-        day = fbDateTime.day,
-        hours = fbDateTime.hours,
-        minutes = fbDateTime.minutes,
-        month = fbDateTime.month,
-        rawValue = fbDateTime.rawValue,
-        seconds = fbDateTime.seconds,
-        year = fbDateTime.year,
-        isUtc = fbDateTime.isUtc
+    internal constructor(mlDateTime: MlBarcode.CalendarDateTime) : this(
+        day = mlDateTime.day,
+        hours = mlDateTime.hours,
+        minutes = mlDateTime.minutes,
+        month = mlDateTime.month,
+        rawValue = mlDateTime.rawValue,
+        seconds = mlDateTime.seconds,
+        year = mlDateTime.year,
+        isUtc = mlDateTime.isUtc
     )
 }
 

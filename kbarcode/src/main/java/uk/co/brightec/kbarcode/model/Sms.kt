@@ -7,9 +7,9 @@ data class Sms(
     val phoneNumber: String?
 ) {
 
-    internal constructor(fbSms: MlBarcode.Sms) : this(
-        message = fbSms.message,
-        phoneNumber = fbSms.phoneNumber
+    internal constructor(mlSms: MlBarcode.Sms) : this(
+        message = mlSms.message,
+        phoneNumber = mlSms.phoneNumber
     )
 }
 

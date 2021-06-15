@@ -23,7 +23,7 @@ import uk.co.brightec.kbarcode.camera.FrameMetadata
 
 @ExperimentalCoroutinesApi
 @SmallTest
-internal class VisionImageProcessorSingleBaseTest {
+internal class ImageProcessorBaseTest {
 
     private val testScope = TestCoroutineScope()
 
@@ -101,7 +101,7 @@ internal class VisionImageProcessorSingleBaseTest {
         val image = mock<Image>()
         val frameMetadata = mock<FrameMetadata>()
         val visionImage = mock<InputImage>()
-        doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
+        doReturn(visionImage).whenever(processor).convertToInputImage(any(), any())
 
         // WHEN
         processor.startDetection(image, frameMetadata)
@@ -117,7 +117,7 @@ internal class VisionImageProcessorSingleBaseTest {
             val image = mock<Image>()
             val frameMetadata = mock<FrameMetadata>()
             val visionImage = mock<InputImage>()
-            doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
+            doReturn(visionImage).whenever(processor).convertToInputImage(any(), any())
             val foo = mock<Foo>()
             processor.mockSuccess(foo)
             val listener = mock<((Image) -> Unit)>()
@@ -137,7 +137,7 @@ internal class VisionImageProcessorSingleBaseTest {
         val image = mock<Image>()
         val frameMetadata = mock<FrameMetadata>()
         val visionImage = mock<InputImage>()
-        doReturn(visionImage).whenever(processor).convertToVisionImage(any(), any())
+        doReturn(visionImage).whenever(processor).convertToInputImage(any(), any())
         val error = mock<Exception>()
         processor.mockError(error)
         val listener = mock<((Image) -> Unit)>()
@@ -153,7 +153,7 @@ internal class VisionImageProcessorSingleBaseTest {
 
     private class Foo
 
-    private class VisionImageProcessorSingleBaseImpl : VisionImageProcessorSingleBase<Foo>() {
+    private class VisionImageProcessorSingleBaseImpl : ImageProcessorBase<Foo>() {
 
         internal val task = mock<Task<Foo>> {
             on { isCanceled } doReturn false

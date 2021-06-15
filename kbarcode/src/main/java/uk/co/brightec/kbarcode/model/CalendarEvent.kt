@@ -12,14 +12,14 @@ data class CalendarEvent(
     val summary: String?
 ) {
 
-    internal constructor(fbEvent: MlBarcode.CalendarEvent) : this(
-        description = fbEvent.description,
-        end = fbEvent.end?.convert(),
-        location = fbEvent.location,
-        organizer = fbEvent.organizer,
-        start = fbEvent.start?.convert(),
-        status = fbEvent.status,
-        summary = fbEvent.summary
+    internal constructor(mlEvent: MlBarcode.CalendarEvent) : this(
+        description = mlEvent.description,
+        end = mlEvent.end?.convert(),
+        location = mlEvent.location,
+        organizer = mlEvent.organizer,
+        start = mlEvent.start?.convert(),
+        status = mlEvent.status,
+        summary = mlEvent.summary
     )
 }
 

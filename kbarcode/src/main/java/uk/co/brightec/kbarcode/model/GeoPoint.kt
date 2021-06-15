@@ -7,9 +7,9 @@ data class GeoPoint(
     val lng: Double
 ) {
 
-    internal constructor(fbGeoPoint: MlBarcode.GeoPoint) : this(
-        lat = fbGeoPoint.lat,
-        lng = fbGeoPoint.lng
+    internal constructor(mlGeoPoint: MlBarcode.GeoPoint) : this(
+        lat = mlGeoPoint.lat,
+        lng = mlGeoPoint.lng
     )
 }
 

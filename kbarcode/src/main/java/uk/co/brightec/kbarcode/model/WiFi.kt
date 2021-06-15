@@ -10,10 +10,10 @@ data class WiFi(
     val ssid: String?
 ) {
 
-    internal constructor(fbWiFi: MlBarcode.WiFi) : this(
-        encryptionType = fbWiFi.encryptionType,
-        password = fbWiFi.password,
-        ssid = fbWiFi.ssid
+    internal constructor(mlWiFi: MlBarcode.WiFi) : this(
+        encryptionType = mlWiFi.encryptionType,
+        password = mlWiFi.password,
+        ssid = mlWiFi.ssid
     )
 
     companion object {

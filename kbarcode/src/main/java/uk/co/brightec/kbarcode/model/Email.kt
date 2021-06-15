@@ -11,11 +11,11 @@ data class Email(
     val type: Int
 ) {
 
-    internal constructor(fbEmail: MlBarcode.Email) : this(
-        address = fbEmail.address,
-        body = fbEmail.body,
-        subject = fbEmail.subject,
-        type = fbEmail.type
+    internal constructor(mlEmail: MlBarcode.Email) : this(
+        address = mlEmail.address,
+        body = mlEmail.body,
+        subject = mlEmail.subject,
+        type = mlEmail.type
     )
 
     companion object {

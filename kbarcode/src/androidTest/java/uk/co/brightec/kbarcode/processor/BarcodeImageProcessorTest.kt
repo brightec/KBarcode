@@ -21,19 +21,19 @@ import uk.co.brightec.kbarcode.Barcode
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 @MediumTest
-internal class BarcodeProcessorSingleTest {
+internal class BarcodeImageProcessorTest {
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
     private lateinit var scanner: BarcodeScanner
 
-    private lateinit var processor: BarcodeProcessorSingle
+    private lateinit var processor: BarcodeImageProcessor
 
     @Before
     fun before() {
         scanner = mock()
-        processor = spy(BarcodeProcessorSingle())
+        processor = spy(BarcodeImageProcessor())
         processor.scanner = scanner
         doReturn(scanner).whenever(processor).createScanner()
 

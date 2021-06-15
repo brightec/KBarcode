@@ -9,9 +9,9 @@ data class Address(
     val type: Int
 ) {
 
-    internal constructor(fbAddress: MlBarcode.Address) : this(
-        addressLines = fbAddress.addressLines.toList(),
-        type = fbAddress.type
+    internal constructor(mlAddress: MlBarcode.Address) : this(
+        addressLines = mlAddress.addressLines.toList(),
+        type = mlAddress.type
     )
 
     companion object {

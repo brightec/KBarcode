@@ -15,8 +15,7 @@ import kotlinx.coroutines.withContext
 import uk.co.brightec.kbarcode.camera.FrameMetadata
 import java.nio.ByteBuffer
 
-internal abstract class VisionImageProcessorSingleBase<T> :
-    VisionImageProcessorSingle {
+internal abstract class ImageProcessorBase<T> : ImageProcessor {
 
     @VisibleForTesting
     internal var processingImage: Image? = null
@@ -66,8 +65,8 @@ internal abstract class VisionImageProcessorSingleBase<T> :
     ) {
         @Suppress("TooGenericExceptionCaught") // As specific as we can be with Firebase
         try {
-            val fbImage = convertToVisionImage(image, metadata)
-            val result = detectInImage(fbImage).await()
+            val inputImage = convertToInputImage(image, metadata)
+            val result = detectInImage(inputImage).await()
             onSuccess(result, metadata)
         } catch (e: Exception) {
             onFailure(e)
@@ -78,7 +77,7 @@ internal abstract class VisionImageProcessorSingleBase<T> :
 
     @VisibleForTesting
     @Throws(IllegalStateException::class)
-    internal suspend fun convertToVisionImage(image: Image, frameMetadata: FrameMetadata) =
+    internal suspend fun convertToInputImage(image: Image, frameMetadata: FrameMetadata) =
         withContext(Dispatchers.Default) {
             InputImage.fromMediaImage(image, frameMetadata.rotation)
         }

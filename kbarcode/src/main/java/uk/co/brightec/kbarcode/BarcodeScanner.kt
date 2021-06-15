@@ -20,7 +20,7 @@ import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
 import uk.co.brightec.kbarcode.camera.OnCameraReadyListener
 import uk.co.brightec.kbarcode.extension.BARCODE_FORMAT_ALL_MIN_WIDTH
 import uk.co.brightec.kbarcode.extension.getMinWidth
-import uk.co.brightec.kbarcode.processor.BarcodeProcessorSingle
+import uk.co.brightec.kbarcode.processor.BarcodeImageProcessor
 import uk.co.brightec.kbarcode.processor.OnBarcodeListener
 import uk.co.brightec.kbarcode.processor.OnBarcodesListener
 import uk.co.brightec.kbarcode.util.OpenForTesting
@@ -29,7 +29,7 @@ import uk.co.brightec.kbarcode.util.OpenForTesting
 class BarcodeScanner internal constructor(
     private val cameraSource: Camera2Source,
     private val windowManager: WindowManager,
-    private val frameProcessor: BarcodeProcessorSingle = BarcodeProcessorSingle()
+    private val frameProcessor: BarcodeImageProcessor = BarcodeImageProcessor()
 ) : KBarcode.Scanner {
 
     override var onBarcodesListener: OnBarcodesListener? = null
@@ -150,7 +150,6 @@ class BarcodeScanner internal constructor(
         frameProcessor.barcodesSort = comparator
     }
 
-    // TODO : alistairsykes 08/03/2019 : Discuss with nickholcombe - Should this be here
     override fun setScaleType(@BarcodeView.ScaleType scaleType: Int) {
         Timber.v("ScaleType has no affect on ${BarcodeScanner::class.java.simpleName}")
     }

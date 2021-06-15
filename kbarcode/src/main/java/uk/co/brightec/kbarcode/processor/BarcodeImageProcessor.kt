@@ -11,19 +11,19 @@ import com.google.mlkit.vision.common.InputImage
 import timber.log.Timber
 import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.camera.FrameMetadata
-import uk.co.brightec.kbarcode.processor.base.VisionImageProcessorSingleBase
+import uk.co.brightec.kbarcode.processor.base.ImageProcessorBase
 import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 import uk.co.brightec.kbarcode.util.OpenForTesting
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
 @OpenForTesting
-internal class BarcodeProcessorSingle(
+internal class BarcodeImageProcessor(
     formats: IntArray = intArrayOf(
         Barcode.FORMAT_EAN_13,
         Barcode.FORMAT_EAN_8
     ),
     var barcodesSort: Comparator<Barcode>? = null
-) : VisionImageProcessorSingleBase<List<MlBarcode>>() {
+) : ImageProcessorBase<List<MlBarcode>>() {
 
     var formats: IntArray = formats
         set(value) {

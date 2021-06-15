@@ -7,9 +7,9 @@ data class UrlBookmark(
     val url: String?
 ) {
 
-    internal constructor(fbUrlBookmark: MlBarcode.UrlBookmark) : this(
-        title = fbUrlBookmark.title,
-        url = fbUrlBookmark.url
+    internal constructor(mlUrlBookmark: MlBarcode.UrlBookmark) : this(
+        title = mlUrlBookmark.title,
+        url = mlUrlBookmark.url
     )
 }
 

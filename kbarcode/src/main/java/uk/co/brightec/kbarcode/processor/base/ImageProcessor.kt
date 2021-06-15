@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
 /**
  * An interface to process the images with different ML Kit detectors and custom image models.
  */
-internal interface VisionImageProcessorSingle {
+internal interface ImageProcessor {
 
     /**
      * Processes the images with the underlying machine learning models.

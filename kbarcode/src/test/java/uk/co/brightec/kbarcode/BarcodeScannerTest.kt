@@ -33,7 +33,7 @@ import uk.co.brightec.kbarcode.camera.CameraException
 import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
 import uk.co.brightec.kbarcode.camera.OnCameraReadyListener
 import uk.co.brightec.kbarcode.extension.getMinWidth
-import uk.co.brightec.kbarcode.processor.BarcodeProcessorSingle
+import uk.co.brightec.kbarcode.processor.BarcodeImageProcessor
 
 @Suppress("LargeClass")
 @SmallTest
@@ -44,7 +44,7 @@ internal class BarcodeScannerTest {
 
     private lateinit var cameraSource: Camera2Source
     private lateinit var windowManager: WindowManager
-    private lateinit var frameProcessor: BarcodeProcessorSingle
+    private lateinit var frameProcessor: BarcodeImageProcessor
 
     private lateinit var barcodeScanner: BarcodeScanner
 

@@ -19,21 +19,21 @@ data class DrivingLicense(
     val middleName: String?
 ) {
 
-    internal constructor(fbDrivingLicense: MlBarcode.DriverLicense) : this(
-        addressCity = fbDrivingLicense.addressCity,
-        addressState = fbDrivingLicense.addressState,
-        addressStreet = fbDrivingLicense.addressStreet,
-        addressZip = fbDrivingLicense.addressZip,
-        birthDate = fbDrivingLicense.birthDate,
-        documentType = fbDrivingLicense.documentType,
-        expiryDate = fbDrivingLicense.expiryDate,
-        firstName = fbDrivingLicense.firstName,
-        gender = fbDrivingLicense.gender,
-        issueDate = fbDrivingLicense.issueDate,
-        issuingCountry = fbDrivingLicense.issuingCountry,
-        lastName = fbDrivingLicense.lastName,
-        licenseNumber = fbDrivingLicense.licenseNumber,
-        middleName = fbDrivingLicense.middleName
+    internal constructor(mlDrivingLicense: MlBarcode.DriverLicense) : this(
+        addressCity = mlDrivingLicense.addressCity,
+        addressState = mlDrivingLicense.addressState,
+        addressStreet = mlDrivingLicense.addressStreet,
+        addressZip = mlDrivingLicense.addressZip,
+        birthDate = mlDrivingLicense.birthDate,
+        documentType = mlDrivingLicense.documentType,
+        expiryDate = mlDrivingLicense.expiryDate,
+        firstName = mlDrivingLicense.firstName,
+        gender = mlDrivingLicense.gender,
+        issueDate = mlDrivingLicense.issueDate,
+        issuingCountry = mlDrivingLicense.issuingCountry,
+        lastName = mlDrivingLicense.lastName,
+        licenseNumber = mlDrivingLicense.licenseNumber,
+        middleName = mlDrivingLicense.middleName
     )
 }
 

@@ -43,22 +43,22 @@ data class Barcode(
     val wifi: WiFi?
 ) {
 
-    internal constructor(fbBarcode: MlBarcode) : this(
-        boundingBox = fbBarcode.boundingBox,
-        calendarEvent = fbBarcode.calendarEvent?.convert(),
-        contactInfo = fbBarcode.contactInfo?.convert(),
-        cornerPoints = fbBarcode.cornerPoints?.toList(),
-        displayValue = fbBarcode.displayValue,
-        driverLicense = fbBarcode.driverLicense?.convert(),
-        email = fbBarcode.email?.convert(),
-        format = fbBarcode.format,
-        geoPoint = fbBarcode.geoPoint?.convert(),
-        phone = fbBarcode.phone?.convert(),
-        rawValue = fbBarcode.rawValue,
-        sms = fbBarcode.sms?.convert(),
-        url = fbBarcode.url?.convert(),
-        valueType = fbBarcode.valueType,
-        wifi = fbBarcode.wifi?.convert()
+    internal constructor(mlBarcode: MlBarcode) : this(
+        boundingBox = mlBarcode.boundingBox,
+        calendarEvent = mlBarcode.calendarEvent?.convert(),
+        contactInfo = mlBarcode.contactInfo?.convert(),
+        cornerPoints = mlBarcode.cornerPoints?.toList(),
+        displayValue = mlBarcode.displayValue,
+        driverLicense = mlBarcode.driverLicense?.convert(),
+        email = mlBarcode.email?.convert(),
+        format = mlBarcode.format,
+        geoPoint = mlBarcode.geoPoint?.convert(),
+        phone = mlBarcode.phone?.convert(),
+        rawValue = mlBarcode.rawValue,
+        sms = mlBarcode.sms?.convert(),
+        url = mlBarcode.url?.convert(),
+        valueType = mlBarcode.valueType,
+        wifi = mlBarcode.wifi?.convert()
     )
 
     override fun toString() = displayValue ?: super.toString()

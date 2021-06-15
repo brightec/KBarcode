@@ -12,14 +12,14 @@ data class PersonName(
     val suffix: String?
 ) {
 
-    internal constructor(fbPersonName: MlBarcode.PersonName) : this(
-        first = fbPersonName.first,
-        formattedName = fbPersonName.formattedName,
-        last = fbPersonName.last,
-        middle = fbPersonName.middle,
-        prefix = fbPersonName.prefix,
-        pronunciation = fbPersonName.pronunciation,
-        suffix = fbPersonName.suffix
+    internal constructor(mlPersonName: MlBarcode.PersonName) : this(
+        first = mlPersonName.first,
+        formattedName = mlPersonName.formattedName,
+        last = mlPersonName.last,
+        middle = mlPersonName.middle,
+        prefix = mlPersonName.prefix,
+        pronunciation = mlPersonName.pronunciation,
+        suffix = mlPersonName.suffix
     )
 }
 

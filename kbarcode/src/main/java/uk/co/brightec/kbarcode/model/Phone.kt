@@ -9,9 +9,9 @@ data class Phone(
     val type: Int
 ) {
 
-    internal constructor(fbPhone: MlBarcode.Phone) : this(
-        number = fbPhone.number,
-        type = fbPhone.type
+    internal constructor(mlPhone: MlBarcode.Phone) : this(
+        number = mlPhone.number,
+        type = mlPhone.type
     )
 
     companion object {
