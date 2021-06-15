@@ -20,7 +20,7 @@ We can understand why you may think that, but there are some key reasons we deci
 
 -  **Quality** We want this library to be a high quality production ready library.
 -  **Camera2** Many barcode libraries still use camera1 API's. These are now deprecated and although unlikely to be removed, you can get better performance and stability from camera2. You are also safe in the knowledge that Android will work to fix issues, and the library will have more longevity.
--  **Firebase** This library uses Firebase to process the frames and return barcodes. The Firebase team are committed to these API's and continue to work to improve them.
+-  **MLKit** This library uses Google MLKit to process the frames and return barcodes. The Google team are committed to these API's and continue to work to improve them.
 -  **Tested** We want this library to have tests. It's surprising how many don't.
 -  **Simple** We want the implementation to be simple, but not try to hide away too much of the complexity of the task.
 
