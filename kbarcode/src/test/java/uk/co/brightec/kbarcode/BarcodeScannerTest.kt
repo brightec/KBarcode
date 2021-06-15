@@ -91,36 +91,17 @@ internal class BarcodeScannerTest {
     }
 
     @Test
-    fun cameraNotStarted__addSurface__addsSurface() {
+    fun nothing__addSurface__callsUpdateCameraFeature() {
         // GIVEN
-        whenever(cameraSource.isStarted()).thenReturn(false)
+        // nothing
 
         // WHEN
         val surface = mock<Surface>()
         barcodeScanner.addSurface(surface)
 
         // THEN
-        verify(barcodeScanner, never()).release()
+        verify(barcodeScanner).updateCameraFeature(any())
         assertTrue(barcodeScanner.customSurfaces.contains(surface))
-        verify(barcodeScanner, never()).start()
-    }
-
-    @Test
-    fun cameraStarted__addSurface__releases_addsSurface_starts() {
-        doNothing().whenever(barcodeScanner).release()
-        doNothing().whenever(barcodeScanner).start()
-
-        // GIVEN
-        whenever(cameraSource.isStarted()).thenReturn(true)
-
-        // WHEN
-        val surface = mock<Surface>()
-        barcodeScanner.addSurface(surface)
-
-        // THEN
-        verify(barcodeScanner).release()
-        assertTrue(barcodeScanner.customSurfaces.contains(surface))
-        verify(barcodeScanner).start()
     }
 
     @Test
@@ -251,36 +232,31 @@ internal class BarcodeScannerTest {
     }
 
     @Test
-    fun cameraNotStarted__setCameraFacing__setsOnCamera() {
+    fun nothing__setCameraFacing__callsUpdateCameraFeature() {
         // GIVEN
-        whenever(cameraSource.isStarted()).thenReturn(false)
+        // nothing
 
         // WHEN
         val facing = -1
         barcodeScanner.setCameraFacing(facing)
 
         // THEN
-        verify(barcodeScanner, never()).release()
+        verify(barcodeScanner).updateCameraFeature(any())
         verify(cameraSource).requestedFacing = facing
-        verify(barcodeScanner, never()).start()
     }
 
     @Test
-    fun cameraStarted__setCameraFacing__releases_setsOnCamera_starts() {
-        doNothing().whenever(barcodeScanner).release()
-        doNothing().whenever(barcodeScanner).start()
-
+    fun nothing__setCameraFlashMode__callsUpdateCameraFeature() {
         // GIVEN
-        whenever(cameraSource.isStarted()).thenReturn(true)
+        // nothing
 
         // WHEN
-        val facing = -1
-        barcodeScanner.setCameraFacing(facing)
+        val flashMode = -1
+        barcodeScanner.setCameraFlashMode(flashMode)
 
         // THEN
-        verify(barcodeScanner).release()
-        verify(cameraSource).requestedFacing = facing
-        verify(barcodeScanner).start()
+        verify(barcodeScanner).updateCameraFeature(any())
+        verify(cameraSource).requestedFlashMode = flashMode
     }
 
     @Test
@@ -1055,5 +1031,38 @@ internal class BarcodeScannerTest {
         // THEN
         val expected = Barcode.FORMAT_PDF417.getMinWidth() / BARCODE_SCREEN_PROPORTION
         assertEquals(expected.toInt(), result)
+    }
+
+    @Test
+    fun cameraNotStarted__updateCameraFeature__callsFunction() {
+        // GIVEN
+        whenever(cameraSource.isStarted()).thenReturn(false)
+
+        // WHEN
+        val updateFeature = mock<() -> Unit>()
+        barcodeScanner.updateCameraFeature(updateFeature)
+
+        // THEN
+        verify(barcodeScanner, never()).release()
+        verify(updateFeature).invoke()
+        verify(barcodeScanner, never()).start()
+    }
+
+    @Test
+    fun cameraStarted__updateCameraFeature__releases_callsFunction_starts() {
+        doNothing().whenever(barcodeScanner).release()
+        doNothing().whenever(barcodeScanner).start()
+
+        // GIVEN
+        whenever(cameraSource.isStarted()).thenReturn(true)
+
+        // WHEN
+        val updateFeature = mock<() -> Unit>()
+        barcodeScanner.updateCameraFeature(updateFeature)
+
+        // THEN
+        verify(barcodeScanner).release()
+        verify(updateFeature).invoke()
+        verify(barcodeScanner).start()
     }
 }

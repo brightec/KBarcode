@@ -80,14 +80,8 @@ class BarcodeScanner internal constructor(
     }
 
     fun addSurface(surface: Surface) {
-        val cameraWasStarted = cameraSource.isStarted()
-        if (cameraWasStarted) {
-            release()
-        }
-        customSurfaces.add(surface)
-        if (cameraWasStarted) {
-            @Suppress("MissingPermission") // Already been started manually
-            start()
+        updateCameraFeature {
+            customSurfaces.add(surface)
         }
     }
 
@@ -123,14 +117,14 @@ class BarcodeScanner internal constructor(
     }
 
     override fun setCameraFacing(facing: Int) {
-        val cameraWasStarted = cameraSource.isStarted()
-        if (cameraWasStarted) {
-            release()
+        updateCameraFeature {
+            cameraSource.requestedFacing = facing
         }
-        cameraSource.requestedFacing = facing
-        if (cameraWasStarted) {
-            @Suppress("MissingPermission") // Already been started manually
-            start()
+    }
+
+    override fun setCameraFlashMode(flashMode: Int) {
+        updateCameraFeature {
+            cameraSource.requestedFlashMode = flashMode
         }
     }
 
@@ -252,6 +246,22 @@ class BarcodeScanner internal constructor(
         val minWidthForBarcodes = (minWidth / BARCODE_SCREEN_PROPORTION).toInt()
         Timber.v("minWidthForBarcodes() = $minWidthForBarcodes")
         return minWidthForBarcodes
+    }
+
+    /**
+     * Update a given camera feature. It will release and start the camera as needed.
+     */
+    @VisibleForTesting
+    internal fun updateCameraFeature(updateFeature: () -> Unit) {
+        val cameraWasStarted = cameraSource.isStarted()
+        if (cameraWasStarted) {
+            release()
+        }
+        updateFeature()
+        if (cameraWasStarted) {
+            @Suppress("MissingPermission") // Already been started manually
+            start()
+        }
     }
 
     companion object {

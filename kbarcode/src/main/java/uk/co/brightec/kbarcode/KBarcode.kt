@@ -35,6 +35,8 @@ class KBarcode {
 
         fun setCameraFacing(facing: Int)
 
+        fun setCameraFlashMode(flashMode: Int)
+
         fun setBarcodeFormats(formats: IntArray)
 
         fun setMinBarcodeWidth(@Px minBarcodeWidth: Int?)
@@ -45,6 +47,7 @@ class KBarcode {
 
         fun setOptions(options: Options) {
             setCameraFacing(options.cameraFacing)
+            setCameraFlashMode(options.cameraFlashMode)
             setBarcodeFormats(options.barcodeFormats)
             setMinBarcodeWidth(options.minBarcodeWidth)
             setBarcodesSort(options.barcodesSort)

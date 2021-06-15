@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +33,7 @@ internal class ProgrammaticActivity : AppCompatActivity(),
         barcodeView.setOptions(
             Options.Builder()
                 .cameraFacing(CameraCharacteristics.LENS_FACING_BACK)
+                .cameraFlashMode(CameraMetadata.FLASH_MODE_OFF)
                 .barcodeFormats(
                     intArrayOf(
                         Barcode.FORMAT_CODABAR, Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,

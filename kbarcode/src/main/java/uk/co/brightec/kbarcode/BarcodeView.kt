@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata
 import android.os.Build
 import android.util.AttributeSet
 import android.view.SurfaceHolder
@@ -86,6 +87,8 @@ class BarcodeView @JvmOverloads constructor(
             try {
                 val attrFacing = getInteger(R.styleable.BarcodeView_cameraFacing, 1)
                 setCameraFacing(cameraFacingAttrConvert(attrFacing))
+                val attrFlashMode = getInteger(R.styleable.BarcodeView_cameraFlashMode, 0)
+                setCameraFlashMode(cameraFlashModeAttrConvert(attrFlashMode))
                 val attrFormats = getInteger(R.styleable.BarcodeView_formats, 0)
                 setBarcodeFormats(formatsAttrConvert(attrFormats))
                 val attrMinBarcodeWidth = getInteger(R.styleable.BarcodeView_minBarcodeWidth, -1)
@@ -147,6 +150,10 @@ class BarcodeView @JvmOverloads constructor(
         barcodeScanner.setCameraFacing(facing)
     }
 
+    override fun setCameraFlashMode(flashMode: Int) {
+        barcodeScanner.setCameraFlashMode(flashMode)
+    }
+
     override fun setBarcodeFormats(formats: IntArray) {
         barcodeScanner.setBarcodeFormats(formats)
     }
@@ -183,6 +190,14 @@ class BarcodeView @JvmOverloads constructor(
             CameraCharacteristics.LENS_FACING_BACK
         }
         else -> CameraCharacteristics.LENS_FACING_BACK
+    }
+
+    @VisibleForTesting
+    internal fun cameraFlashModeAttrConvert(attr: Int) = when (attr) {
+        0 -> CameraMetadata.FLASH_MODE_OFF
+        1 -> CameraMetadata.FLASH_MODE_SINGLE
+        2 -> CameraMetadata.FLASH_MODE_TORCH
+        else -> CameraMetadata.FLASH_MODE_OFF
     }
 
     @Suppress("MagicNumber") // Intended magic number, purpose of method

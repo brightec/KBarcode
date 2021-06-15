@@ -170,7 +170,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraId_cameraOpened_sufacesInvalid__start__setsNotOpening_setCameraDevice_error() {
+    fun cameraId_cameraOpened_surfacesInvalid__start__setsNotOpening_setCameraDevice_error() {
         doNothing().whenever(cameraSource).createCaptureSession(any(), any())
 
         // GIVEN
@@ -477,7 +477,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_session_autoFocus__createCaptureRequest__setsRepeatingRequest() {
+    fun cameraDevice_session_autoFocus_flashMode__createCaptureRequest__setsRepeatingRequest() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
         val session = mock<CameraCaptureSession>()
@@ -488,6 +488,8 @@ internal class Camera2SourceTest {
         whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
         val autoFocus = 1
         doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
+        val flashMode = -1
+        cameraSource.requestedFlashMode = flashMode
 
         // WHEN
         val surfaces = listOf<Surface>(mock(), mock())
@@ -497,6 +499,7 @@ internal class Camera2SourceTest {
 
         // THEN
         verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
+        verify(captureRequestBuilder).set(CaptureRequest.FLASH_MODE, flashMode)
         verify(captureRequestBuilder).addTarget(surfaces[0])
         verify(captureRequestBuilder).addTarget(surfaces[1])
         verify(session).setRepeatingRequest(captureRequest, null, null)

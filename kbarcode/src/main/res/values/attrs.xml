@@ -6,6 +6,11 @@
             <enum name="back" value="1" />
             <enum name="external" value="2" />
         </attr>
+        <attr name="cameraFlashMode" format="enum">
+            <enum name="off" value="0" />
+            <enum name="single" value="1" />
+            <enum name="torch" value="2" />
+        </attr>
         <attr name="formats" format="enum">
             <enum name="all" value="0" />
             <!-- CODABAR, EAN_13, EAN_8, ITF, UPC_A, UPC_E -->

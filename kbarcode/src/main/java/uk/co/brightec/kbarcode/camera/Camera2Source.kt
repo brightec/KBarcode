@@ -26,6 +26,7 @@ internal class Camera2Source(
     @VisibleForTesting
     internal var cameraOpening = false
     var requestedFacing = CameraCharacteristics.LENS_FACING_BACK
+    var requestedFlashMode = CameraMetadata.FLASH_MODE_OFF
 
     constructor(context: Context) : this(
         cameraManager = context.getSystemService(CAMERA_SERVICE) as CameraManager
@@ -225,6 +226,7 @@ internal class Camera2Source(
             if (autoFocus != null) {
                 builder.set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
             }
+            builder.set(CaptureRequest.FLASH_MODE, requestedFlashMode)
             for (surface in surfaces) {
                 builder.addTarget(surface)
             }

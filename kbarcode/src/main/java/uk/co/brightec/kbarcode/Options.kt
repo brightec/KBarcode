@@ -1,12 +1,14 @@
 package uk.co.brightec.kbarcode
 
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata
 import androidx.annotation.Px
 import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 
 @Suppress("unused") // API class
 data class Options(
     val cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
+    val cameraFlashMode: Int = CameraMetadata.FLASH_MODE_OFF,
     val barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
     @Px val minBarcodeWidth: Int? = null,
     val barcodesSort: BarcodeComparator? = null,
@@ -15,6 +17,7 @@ data class Options(
 
     class Builder(
         private var cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
+        private var cameraFlashMode: Int = CameraMetadata.FLASH_MODE_OFF,
         private var barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
         @Px private var minBarcodeWidth: Int? = null,
         private var barcodesSort: BarcodeComparator? = null,
@@ -23,6 +26,10 @@ data class Options(
 
         fun cameraFacing(cameraFacing: Int) = apply {
             this.cameraFacing = cameraFacing
+        }
+
+        fun cameraFlashMode(cameraFlashMode: Int) = apply {
+            this.cameraFlashMode = cameraFlashMode
         }
 
         fun barcodeFormats(barcodeFormats: IntArray) = apply {
@@ -47,6 +54,7 @@ data class Options(
 
         fun build() = Options(
             cameraFacing = cameraFacing,
+            cameraFlashMode = cameraFlashMode,
             barcodeFormats = barcodeFormats,
             minBarcodeWidth = minBarcodeWidth,
             barcodesSort = barcodesSort,
@@ -61,6 +69,7 @@ data class Options(
         other as Options
 
         if (cameraFacing != other.cameraFacing) return false
+        if (cameraFlashMode != other.cameraFlashMode) return false
         if (!barcodeFormats.contentEquals(other.barcodeFormats)) return false
         if (minBarcodeWidth != other.minBarcodeWidth) return false
         if (barcodesSort != other.barcodesSort) return false
@@ -71,6 +80,7 @@ data class Options(
 
     override fun hashCode(): Int {
         var result = cameraFacing
+        result = 31 * result + cameraFlashMode.hashCode()
         result = 31 * result + barcodeFormats.contentHashCode()
         result = 31 * result + minBarcodeWidth.hashCode()
         result = 31 * result + (barcodesSort?.hashCode() ?: 0)
