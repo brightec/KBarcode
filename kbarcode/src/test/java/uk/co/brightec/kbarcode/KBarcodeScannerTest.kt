@@ -27,6 +27,7 @@ internal class KBarcodeScannerTest {
         // GIVEN
         val options = mock<Options> {
             on { cameraFacing } doReturn -1
+            on { cameraFlashMode } doReturn -1
             on { barcodeFormats } doReturn intArrayOf(1, 2, 3)
             on { minBarcodeWidth } doReturn -2
             on { barcodesSort } doReturn mock()
@@ -38,6 +39,7 @@ internal class KBarcodeScannerTest {
 
         // THEN
         verify(barcodeScanner).setCameraFacing(options.cameraFacing)
+        verify(barcodeScanner).setCameraFlashMode(options.cameraFlashMode)
         verify(barcodeScanner).setBarcodeFormats(options.barcodeFormats)
         verify(barcodeScanner).setMinBarcodeWidth(options.minBarcodeWidth)
         verify(barcodeScanner).setBarcodesSort(options.barcodesSort)
@@ -71,6 +73,10 @@ internal class KBarcodeScannerTest {
         }
 
         override fun setCameraFacing(facing: Int) {
+            // no-op
+        }
+
+        override fun setCameraFlashMode(flashMode: Int) {
             // no-op
         }
 

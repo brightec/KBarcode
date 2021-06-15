@@ -12,6 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:cameraFacing="back"
+        app:cameraFlashMode="off"
         app:formats="numeric"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

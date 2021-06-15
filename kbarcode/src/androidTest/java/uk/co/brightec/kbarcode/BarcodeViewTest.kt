@@ -3,6 +3,7 @@ package uk.co.brightec.kbarcode
 import android.content.Context
 import android.graphics.Rect
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraMetadata
 import android.os.Build
 import android.util.Size
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -95,6 +96,18 @@ internal class BarcodeViewTest {
     }
 
     @Test
+    fun flashMode_setCameraFlashMode_callsBarcodeScanner() {
+        // GIVEN
+        val flashMode = -1
+
+        // WHEN
+        barcodeView.setCameraFlashMode(flashMode)
+
+        // THEN
+        verify(barcodeScanner).setCameraFlashMode(flashMode)
+    }
+
+    @Test
     fun formats_setBarcodeFormats_callsBarcodeScanner() {
         // GIVEN
         val formats = intArrayOf(-1, -2)
@@ -168,6 +181,42 @@ internal class BarcodeViewTest {
         } else {
             assertEquals(CameraCharacteristics.LENS_FACING_BACK, result)
         }
+    }
+
+    @Test
+    fun attr0__cameraFlashModeAttrConvert__off() {
+        // GIVEN
+        val attr = 0
+
+        // WHEN
+        val result = barcodeView.cameraFlashModeAttrConvert(attr)
+
+        // THEN
+        assertEquals(CameraMetadata.FLASH_MODE_OFF, result)
+    }
+
+    @Test
+    fun attr1__cameraFlashModeAttrConvert__back() {
+        // GIVEN
+        val attr = 1
+
+        // WHEN
+        val result = barcodeView.cameraFlashModeAttrConvert(attr)
+
+        // THEN
+        assertEquals(CameraMetadata.FLASH_MODE_SINGLE, result)
+    }
+
+    @Test
+    fun attr2__cameraFlashModeAttrConvert__externalOrBack() {
+        // GIVEN
+        val attr = 2
+
+        // WHEN
+        val result = barcodeView.cameraFlashModeAttrConvert(attr)
+
+        // THEN
+        assertEquals(CameraMetadata.FLASH_MODE_TORCH, result)
     }
 
     @Test
