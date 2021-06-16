@@ -8,6 +8,7 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.ViewGroup
@@ -53,6 +54,7 @@ class BarcodeView @JvmOverloads constructor(
         }
 
     private val surfaceView = SurfaceView(context)
+
     @ScaleType
     private var previewScaleType: Int = CENTER_INSIDE
         set(value) {
@@ -97,6 +99,11 @@ class BarcodeView @JvmOverloads constructor(
                 setBarcodesSort(sortAttrConvert(attrSort))
                 val attrScaleType = getInteger(R.styleable.BarcodeView_scaleType, 0)
                 setScaleType(scaleTypeAttrConvert(attrScaleType))
+                val attrClearFocusDelay = getInteger(
+                    R.styleable.BarcodeView_clearFocusDelay,
+                    CLEAR_FOCUS_DELAY_DEFAULT.toInt()
+                )
+                setClearFocusDelay(attrClearFocusDelay.toLong())
             } finally {
                 recycle()
             }
@@ -125,6 +132,20 @@ class BarcodeView @JvmOverloads constructor(
         barcodeScanner.addSurface(surfaceHolder.surface)
         @Suppress("LeakingThis") // Intentional invocation
         addView(surfaceView)
+
+        // Add touch listener to request focus on touch
+        surfaceView.setOnTouchListener { _, motionEvent ->
+            val actionMasked = motionEvent.actionMasked
+            if (actionMasked != MotionEvent.ACTION_DOWN) {
+                return@setOnTouchListener false
+            }
+
+            barcodeScanner.requestCameraFocus(
+                viewWidth = surfaceView.width, viewHeight = surfaceView.height,
+                touchX = motionEvent.x, touchY = motionEvent.y
+            )
+            true
+        }
     }
 
     override fun start() {
@@ -168,6 +189,10 @@ class BarcodeView @JvmOverloads constructor(
 
     override fun setScaleType(scaleType: Int) {
         previewScaleType = scaleType
+    }
+
+    override fun setClearFocusDelay(delay: Long) {
+        barcodeScanner.setClearFocusDelay(delay)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -245,6 +270,7 @@ class BarcodeView @JvmOverloads constructor(
     ): Rect {
         @Suppress("MagicNumber") // Make assumption if unknown
         var width = 320
+
         @Suppress("MagicNumber") // Make assumption if unknown
         var height = 240
         val size = barcodeScanner.getOutputSize()
@@ -282,10 +308,12 @@ class BarcodeView @JvmOverloads constructor(
         }
 
         val horizontalMargin = (layoutWidth - childWidth) / 2
+
         @Suppress("UnnecessaryVariable") // For clarity
         val childLeft = horizontalMargin
         val childRight = layoutWidth - horizontalMargin
         val verticalMargin = (layoutHeight - childHeight) / 2
+
         @Suppress("UnnecessaryVariable") // For clarity
         val childTop = verticalMargin
         val childBottom = layoutHeight - verticalMargin
@@ -310,12 +338,16 @@ class BarcodeView @JvmOverloads constructor(
          * dimension of the parent BarcodeView.
          */
         const val CENTER_INSIDE = 0
+
         /**
          * Scale the surface uniformly (maintain it's aspect ratio) so that both dimensions
          * (width and height) of the surface will be equal to or larger than the corresponding
          * dimension of the parent BarcodeView.
          */
         const val CENTER_CROP = 1
+
+        const val CLEAR_FOCUS_DELAY_DEFAULT = 5000L // Millis
+        const val CLEAR_FOCUS_DELAY_NEVER = -1L
     }
 
     @IntDef(

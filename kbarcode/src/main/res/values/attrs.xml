@@ -31,5 +31,8 @@
             <enum name="centerInside" value="0" />
             <enum name="centerCrop" value="1" />
         </attr>
+        <attr name="clearFocusDelay" format="enum|integer">
+            <enum name="never" value="-1" />
+        </attr>
     </declare-styleable>
 </resources>

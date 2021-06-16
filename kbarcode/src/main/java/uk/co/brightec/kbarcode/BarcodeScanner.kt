@@ -2,7 +2,10 @@ package uk.co.brightec.kbarcode
 
 import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.params.MeteringRectangle
 import android.media.ImageReader
+import android.os.Handler
+import android.os.Looper
 import android.util.Size
 import android.view.Surface
 import android.view.WindowManager
@@ -13,6 +16,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import timber.log.Timber
+import uk.co.brightec.kbarcode.BarcodeView.Companion.CLEAR_FOCUS_DELAY_DEFAULT
+import uk.co.brightec.kbarcode.BarcodeView.Companion.CLEAR_FOCUS_DELAY_NEVER
 import uk.co.brightec.kbarcode.camera.Camera2Source
 import uk.co.brightec.kbarcode.camera.CameraException
 import uk.co.brightec.kbarcode.camera.FrameMetadata
@@ -24,6 +29,7 @@ import uk.co.brightec.kbarcode.processor.BarcodeImageProcessor
 import uk.co.brightec.kbarcode.processor.OnBarcodeListener
 import uk.co.brightec.kbarcode.processor.OnBarcodesListener
 import uk.co.brightec.kbarcode.util.OpenForTesting
+
 
 @OpenForTesting
 class BarcodeScanner internal constructor(
@@ -69,6 +75,11 @@ class BarcodeScanner internal constructor(
 
     @VisibleForTesting
     internal var customMinBarcodeWidth: Int? = null
+
+    @VisibleForTesting
+    internal var clearFocusDelay = CLEAR_FOCUS_DELAY_DEFAULT
+
+    private lateinit var handlerClearFocus: Handler
 
     constructor(context: Context) : this(
         cameraSource = Camera2Source(context),
@@ -148,7 +159,26 @@ class BarcodeScanner internal constructor(
         Timber.v("ScaleType has no affect on ${BarcodeScanner::class.java.simpleName}")
     }
 
+    @Throws(IllegalArgumentException::class)
+    override fun setClearFocusDelay(delay: Long) {
+        if (delay != CLEAR_FOCUS_DELAY_NEVER && delay < 0) throw IllegalArgumentException()
+        clearFocusDelay = delay
+    }
+
     fun getOutputSize(): Size? = cameraSource.getOutputSize(minWidthForBarcodes())
+
+    fun requestCameraFocus(
+        viewWidth: Int,
+        viewHeight: Int,
+        touchX: Float,
+        touchY: Float
+    ) {
+        val regions = calculateFocusRegions(
+            viewWidth = viewWidth, viewHeight = viewHeight, touchX = touchX, touchY = touchY
+        ) ?: return
+        cameraSource.requestFocus(regions)
+        scheduleClearFocusRegions(clearFocusDelay)
+    }
 
     @VisibleForTesting
     @RequiresPermission(android.Manifest.permission.CAMERA)
@@ -264,8 +294,97 @@ class BarcodeScanner internal constructor(
         }
     }
 
-    companion object {
+    /**
+     * Calculate the focus region to pass to the camera
+     *
+     * Sources:
+     * https://androidx.tech/artifacts/camera/camera-core/1.0.0-source/androidx/camera/core/DisplayOrientedMeteringPointFactory.java.html
+     * https://androidx.tech/artifacts/camera/camera-core/1.0.0-source/androidx/camera/core/MeteringPointFactory.java.html
+     */
+    @VisibleForTesting
+    internal fun calculateFocusRegions(
+        viewWidth: Int,
+        viewHeight: Int,
+        touchX: Float,
+        touchY: Float
+    ): Array<MeteringRectangle>? {
+        val activeArraySize = cameraSource.getCameraSensorInfoActiveArraySize() ?: return null
+        val rotationCompensation = getRotationCompensation()
+        val cameraFacing = cameraSource.getCameraFacing()
+        val compensateForMirroring =
+            cameraFacing != null && cameraFacing == CameraCharacteristics.LENS_FACING_FRONT
 
+        var outputX: Float
+        var outputY: Float
+        val outputWidth: Float
+        val outputHeight: Float
+
+        if (rotationCompensation == 90 || rotationCompensation == 270) {
+            // We're horizontal. Swap width/height. Swap x/y.
+            outputX = touchY
+            outputY = touchX
+            outputWidth = viewHeight.toFloat()
+            outputHeight = viewWidth.toFloat()
+        } else {
+            outputX = touchX
+            outputY = touchY
+            outputWidth = viewWidth.toFloat()
+            outputHeight = viewHeight.toFloat()
+        }
+
+        // Map to correct coordinates according to relativeCameraOrientation
+        when (rotationCompensation) {
+            90 ->
+                outputY = outputHeight - outputY
+            180 -> {
+                outputX = outputWidth - outputX
+                outputY = outputHeight - outputY
+            }
+            270 ->
+                outputX = outputWidth - outputX
+        }
+
+        // Swap x if it's a mirrored preview
+        if (compensateForMirroring) {
+            outputX = outputWidth - outputX;
+        }
+
+        // Normalized it to [0, 1]
+        outputX /= outputWidth
+        outputY /= outputHeight
+
+        // Create MeteringRectangle
+        val focusAreaTouch = MeteringRectangle(
+            (outputX * activeArraySize.width()).toInt(),
+            (outputY * activeArraySize.height()).toInt(),
+            (activeArraySize.width() * TOUCH_AREA_MULTIPLIER).toInt(),
+            (activeArraySize.height() * TOUCH_AREA_MULTIPLIER).toInt(),
+            MeteringRectangle.METERING_WEIGHT_MAX
+        )
+
+        return arrayOf(focusAreaTouch)
+    }
+
+    /**
+     * Schedule a delayed runnable which will in turn clear the focus regions.
+     */
+    @VisibleForTesting
+    internal fun scheduleClearFocusRegions(delay: Long) {
+        if (delay == CLEAR_FOCUS_DELAY_NEVER) return
+        if (delay < 0) throw IllegalArgumentException()
+
+        if (!::handlerClearFocus.isInitialized) {
+            handlerClearFocus = Handler(Looper.getMainLooper())
+        }
+        handlerClearFocus.removeCallbacksAndMessages(null)
+        handlerClearFocus.postDelayed({
+            if (cameraSource.isStarted()) {
+                cameraSource.clearFocusRegions()
+            }
+        }, delay)
+    }
+
+    companion object {
         @VisibleForTesting
         internal const val BARCODE_SCREEN_PROPORTION = 0.3
         private const val MAX_IMAGES_IN_READER = 3
@@ -275,5 +394,7 @@ class BarcodeScanner internal constructor(
             this[Surface.ROTATION_180] = 180
             this[Surface.ROTATION_270] = 270
         }
+        @VisibleForTesting
+        internal const val TOUCH_AREA_MULTIPLIER = 0.05F
     }
 }

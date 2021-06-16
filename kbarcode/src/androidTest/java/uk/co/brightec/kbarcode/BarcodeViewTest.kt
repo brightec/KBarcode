@@ -144,6 +144,18 @@ internal class BarcodeViewTest {
     }
 
     @Test
+    fun delay_setClearFocusDelay_callsBarcodeScanner() {
+        // GIVEN
+        val delay = 1234L
+
+        // WHEN
+        barcodeView.setClearFocusDelay(delay)
+
+        // THEN
+        verify(barcodeScanner).setClearFocusDelay(delay)
+    }
+
+    @Test
     fun attr0__cameraFacingAttrConvert__front() {
         // GIVEN
         val attr = 0

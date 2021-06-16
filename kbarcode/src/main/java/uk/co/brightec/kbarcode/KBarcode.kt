@@ -45,6 +45,8 @@ class KBarcode {
 
         fun setScaleType(@BarcodeView.ScaleType scaleType: Int)
 
+        fun setClearFocusDelay(delay: Long)
+
         fun setOptions(options: Options) {
             setCameraFacing(options.cameraFacing)
             setCameraFlashMode(options.cameraFlashMode)
@@ -52,6 +54,7 @@ class KBarcode {
             setMinBarcodeWidth(options.minBarcodeWidth)
             setBarcodesSort(options.barcodesSort)
             setScaleType(options.scaleType)
+            setClearFocusDelay(options.clearFocusDelay)
         }
     }
 

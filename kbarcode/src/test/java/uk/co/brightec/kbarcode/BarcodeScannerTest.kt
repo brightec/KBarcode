@@ -1,6 +1,7 @@
 package uk.co.brightec.kbarcode
 
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.params.MeteringRectangle
 import android.media.Image
 import android.media.ImageReader
 import android.util.Size
@@ -9,6 +10,15 @@ import android.view.Surface
 import android.view.WindowManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.filters.SmallTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TestRule
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
@@ -20,13 +30,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
 import uk.co.brightec.kbarcode.BarcodeScanner.Companion.BARCODE_SCREEN_PROPORTION
 import uk.co.brightec.kbarcode.camera.Camera2Source
 import uk.co.brightec.kbarcode.camera.CameraException
@@ -310,6 +313,44 @@ internal class BarcodeScannerTest {
     }
 
     @Test
+    fun delay__setClearFocusDelay__sets() {
+        // GIVEN
+        val delay = 1234L
+
+        // WHEN
+        barcodeScanner.setClearFocusDelay(delay)
+
+        // THEN
+        verify(barcodeScanner).clearFocusDelay = delay
+    }
+
+    @Test
+    fun delayNever__setClearFocusDelay__sets() {
+        // GIVEN
+        val delay = BarcodeView.CLEAR_FOCUS_DELAY_NEVER
+
+        // WHEN
+        barcodeScanner.setClearFocusDelay(delay)
+
+        // THEN
+        verify(barcodeScanner).clearFocusDelay = delay
+    }
+
+    @Test
+    fun delayNegative__setClearFocusDelay__exception() {
+        // GIVEN
+        val delay = -1234L
+
+        // WHEN
+        val result = assertThrows(IllegalArgumentException::class.java) {
+            barcodeScanner.setClearFocusDelay(delay)
+        }
+
+        // THEN
+        assertNotNull(result)
+    }
+
+    @Test
     fun minWidthForBarcodes__getOutputSize__callsCameraWithMinWidth() {
         // GIVEN
         doReturn(-1).whenever(barcodeScanner).minWidthForBarcodes()
@@ -322,6 +363,36 @@ internal class BarcodeScannerTest {
         // THEN
         verify(barcodeScanner).minWidthForBarcodes()
         assertEquals(size, result)
+    }
+
+    @Test
+    fun params__requestCameraFocus__callsCameraSource_scheduleClear() {
+        // STUB
+        val focusAreaTouch = MeteringRectangle(
+            1, 2, 3, 4, MeteringRectangle.METERING_WEIGHT_MAX
+        )
+        val regions = arrayOf(focusAreaTouch)
+        doReturn(regions).whenever(barcodeScanner)
+            .calculateFocusRegions(any(), any(), any(), any())
+        doNothing().whenever(barcodeScanner).scheduleClearFocusRegions(any())
+
+        // GIVEN
+        val viewWidth = 1
+        val viewHeight = 2
+        val touchX = 1.23F
+        val touchY = 4.56F
+
+        // WHEN
+        barcodeScanner.requestCameraFocus(
+            viewWidth = viewWidth, viewHeight = viewHeight, touchX = touchX, touchY = touchY
+        )
+
+        // THEN
+        verify(barcodeScanner).calculateFocusRegions(
+            viewWidth = viewWidth, viewHeight = viewHeight, touchX = touchX, touchY = touchY
+        )
+        verify(cameraSource).requestFocus(regions)
+        verify(barcodeScanner).scheduleClearFocusRegions(any())
     }
 
     @Test
