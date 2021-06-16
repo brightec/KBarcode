@@ -81,6 +81,7 @@ data class Options(
         if (minBarcodeWidth != other.minBarcodeWidth) return false
         if (barcodesSort != other.barcodesSort) return false
         if (scaleType != other.scaleType) return false
+        if (clearFocusDelay != other.clearFocusDelay) return false
 
         return true
     }
@@ -92,6 +93,7 @@ data class Options(
         result = 31 * result + minBarcodeWidth.hashCode()
         result = 31 * result + (barcodesSort?.hashCode() ?: 0)
         result = 31 * result + scaleType.hashCode()
+        result = 31 * result + clearFocusDelay.hashCode()
         return result
     }
 }
