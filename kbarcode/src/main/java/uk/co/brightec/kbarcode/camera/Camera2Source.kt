@@ -174,8 +174,9 @@ internal class Camera2Source(
     fun requestFocus(regions: Array<MeteringRectangle>) {
         // Some safety checks
         val session = this.currentSession ?: return
-        if (getCameraAvailableAfModes()?.contains(CameraMetadata.CONTROL_AF_MODE_AUTO) != true)
+        if (getCameraAvailableAfModes()?.contains(CameraMetadata.CONTROL_AF_MODE_AUTO) != true) {
             return
+        }
         val maxRegionsAf = getCameraAfMaxRegions()
         if (maxRegionsAf == null || maxRegionsAf < 1) return
 

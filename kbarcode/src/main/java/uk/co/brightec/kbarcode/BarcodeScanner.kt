@@ -30,7 +30,7 @@ import uk.co.brightec.kbarcode.processor.OnBarcodeListener
 import uk.co.brightec.kbarcode.processor.OnBarcodesListener
 import uk.co.brightec.kbarcode.util.OpenForTesting
 
-
+@Suppress("TooManyFunctions") // Still feels single responsibility
 @OpenForTesting
 class BarcodeScanner internal constructor(
     private val cameraSource: Camera2Source,
@@ -301,6 +301,8 @@ class BarcodeScanner internal constructor(
      * https://androidx.tech/artifacts/camera/camera-core/1.0.0-source/androidx/camera/core/DisplayOrientedMeteringPointFactory.java.html
      * https://androidx.tech/artifacts/camera/camera-core/1.0.0-source/androidx/camera/core/MeteringPointFactory.java.html
      */
+    // The magic numbers in this method are exclusively related to this function
+    @Suppress("MagicNumber")
     @VisibleForTesting
     internal fun calculateFocusRegions(
         viewWidth: Int,
@@ -346,7 +348,7 @@ class BarcodeScanner internal constructor(
 
         // Swap x if it's a mirrored preview
         if (compensateForMirroring) {
-            outputX = outputWidth - outputX;
+            outputX = outputWidth - outputX
         }
 
         // Normalized it to [0, 1]
@@ -394,6 +396,7 @@ class BarcodeScanner internal constructor(
             this[Surface.ROTATION_180] = 180
             this[Surface.ROTATION_270] = 270
         }
+
         @VisibleForTesting
         internal const val TOUCH_AREA_MULTIPLIER = 0.05F
     }

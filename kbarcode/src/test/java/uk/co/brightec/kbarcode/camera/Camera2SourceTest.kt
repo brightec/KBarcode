@@ -35,6 +35,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 
+@Suppress("LargeClass")
 @SmallTest
 internal class Camera2SourceTest {
 
@@ -1184,7 +1185,7 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_captureIllegalArgExc__createDefaultCaptureRequestBuilder__release_callsListener() {
+    fun cameraDevice_captureIllegalArgExc__createDefaultCaptureRequestBuilder__release_listener() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
         whenever(cameraDevice.createCaptureRequest(any()))
