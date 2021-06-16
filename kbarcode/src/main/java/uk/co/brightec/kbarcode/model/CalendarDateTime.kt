@@ -2,7 +2,7 @@ package uk.co.brightec.kbarcode.model
 
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class CalendarDateTime(
+public data class CalendarDateTime(
     val day: Int,
     val hours: Int,
     val minutes: Int,

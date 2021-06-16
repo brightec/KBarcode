@@ -6,7 +6,7 @@ import androidx.annotation.Px
 import uk.co.brightec.kbarcode.processor.sort.BarcodeComparator
 
 @Suppress("unused") // API class
-data class Options(
+public data class Options(
     val cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
     val cameraFlashMode: Int = CameraMetadata.FLASH_MODE_OFF,
     val barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
@@ -16,7 +16,7 @@ data class Options(
     val clearFocusDelay: Long
 ) {
 
-    class Builder(
+    public class Builder(
         private var cameraFacing: Int = CameraCharacteristics.LENS_FACING_BACK,
         private var cameraFlashMode: Int = CameraMetadata.FLASH_MODE_OFF,
         private var barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
@@ -26,15 +26,15 @@ data class Options(
         private var clearFocusDelay: Long = BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT
     ) {
 
-        fun cameraFacing(cameraFacing: Int) = apply {
+        public fun cameraFacing(cameraFacing: Int): Builder = apply {
             this.cameraFacing = cameraFacing
         }
 
-        fun cameraFlashMode(cameraFlashMode: Int) = apply {
+        public fun cameraFlashMode(cameraFlashMode: Int): Builder = apply {
             this.cameraFlashMode = cameraFlashMode
         }
 
-        fun barcodeFormats(barcodeFormats: IntArray) = apply {
+        public fun barcodeFormats(barcodeFormats: IntArray): Builder = apply {
             this.barcodeFormats = if (barcodeFormats.isEmpty()) {
                 intArrayOf(Barcode.FORMAT_ALL_FORMATS)
             } else {
@@ -42,23 +42,23 @@ data class Options(
             }
         }
 
-        fun minBarcodeWidth(@Px minBarcodeWidth: Int) = apply {
+        public fun minBarcodeWidth(@Px minBarcodeWidth: Int): Builder = apply {
             this.minBarcodeWidth = minBarcodeWidth
         }
 
-        fun barcodesSort(barcodesSort: BarcodeComparator?) = apply {
+        public fun barcodesSort(barcodesSort: BarcodeComparator?): Builder = apply {
             this.barcodesSort = barcodesSort
         }
 
-        fun scaleType(@BarcodeView.ScaleType scaleType: Int) = apply {
+        public fun scaleType(@BarcodeView.ScaleType scaleType: Int): Builder = apply {
             this.scaleType = scaleType
         }
 
-        fun clearFocusDelay(clearFocusDelay: Long) = apply {
+        public fun clearFocusDelay(clearFocusDelay: Long): Builder = apply {
             this.clearFocusDelay = clearFocusDelay
         }
 
-        fun build() = Options(
+        public fun build(): Options = Options(
             cameraFacing = cameraFacing,
             cameraFlashMode = cameraFlashMode,
             barcodeFormats = barcodeFormats,

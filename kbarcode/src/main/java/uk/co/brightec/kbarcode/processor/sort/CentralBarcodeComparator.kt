@@ -4,7 +4,7 @@ import android.graphics.Point
 import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.extension.distanceTo
 
-class CentralBarcodeComparator : BarcodeComparator() {
+public class CentralBarcodeComparator : BarcodeComparator() {
 
     private val centerFrame by lazy {
         Point(frameMetadata.width / 2, frameMetadata.height / 2)

@@ -28,8 +28,10 @@ internal class Camera2Source(
 
     @VisibleForTesting
     internal var cameraDevice: CameraDevice? = null
+
     @VisibleForTesting
     internal var currentSession: CameraCaptureSession? = null
+
     @VisibleForTesting
     internal var currentSurfaces: List<Surface>? = null
 
@@ -73,45 +75,49 @@ internal class Camera2Source(
         }
         cameraOpening = true
         try {
-            cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback() {
-                override fun onOpened(camera: CameraDevice) {
-                    cameraOpening = false
-                    cameraDevice = camera
+            cameraManager.openCamera(
+                cameraId,
+                object : CameraDevice.StateCallback() {
+                    override fun onOpened(camera: CameraDevice) {
+                        cameraOpening = false
+                        cameraDevice = camera
 
-                    if (surfaces.any { !it.isValid }) {
-                        val message = "Surfaces no longer valid"
-                        val exception = CameraException(message)
-                        releaseCameraAndReportException(
-                            listener = listener, message = message, exception = exception
+                        if (surfaces.any { !it.isValid }) {
+                            val message = "Surfaces no longer valid"
+                            val exception = CameraException(message)
+                            releaseCameraAndReportException(
+                                listener = listener, message = message, exception = exception
+                            )
+                            return
+                        }
+
+                        listener?.onCameraReady()
+                        createCaptureSession(
+                            surfaces = surfaces,
+                            listener = listener
                         )
-                        return
                     }
 
-                    listener?.onCameraReady()
-                    createCaptureSession(
-                        surfaces = surfaces,
-                        listener = listener
-                    )
-                }
+                    override fun onDisconnected(camera: CameraDevice) {
+                        release()
+                    }
 
-                override fun onDisconnected(camera: CameraDevice) {
-                    release()
-                }
-
-                override fun onError(camera: CameraDevice, error: Int) {
-                    val exception = createExceptionFromCameraDeviceError(error)
-                    releaseCameraAndReportException(
-                        listener = listener,
-                        message = "Error opening camera",
-                        exception = exception
-                    )
-                }
-            }, null)
+                    override fun onError(camera: CameraDevice, error: Int) {
+                        val exception = createExceptionFromCameraDeviceError(error)
+                        releaseCameraAndReportException(
+                            listener = listener,
+                            message = "Error opening camera",
+                            exception = exception
+                        )
+                    }
+                },
+                null
+            )
         } catch (e: android.hardware.camera2.CameraAccessException) {
             releaseCameraAndReportException(
                 listener = listener,
                 message = "Camera is disabled by device policy, has been disconnected, or is " +
-                        "being used by a higher-priority camera API client.",
+                    "being used by a higher-priority camera API client.",
                 cause = e
             )
         } catch (e: IllegalArgumentException) {
@@ -253,7 +259,8 @@ internal class Camera2Source(
     ) {
         try {
             cameraDevice?.createCaptureSession(
-                surfaces, object : CameraCaptureSession.StateCallback() {
+                surfaces,
+                object : CameraCaptureSession.StateCallback() {
                     override fun onConfigured(session: CameraCaptureSession) {
                         if (cameraDevice == null) return
                         currentSession = session

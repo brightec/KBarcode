@@ -2,7 +2,7 @@ package uk.co.brightec.kbarcode.model
 
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class PersonName(
+public data class PersonName(
     val first: String?,
     val formattedName: String?,
     val last: String?,

@@ -14,7 +14,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 def qualityConfigDir = "$project.rootDir/config/quality"
@@ -33,10 +33,10 @@ pmd {
 dependencies {
     checkstyle 'com.puppycrawl.tools:checkstyle:8.27'
 
-    ktlint 'com.pinterest:ktlint:0.36.0'
+    ktlint 'com.pinterest:ktlint:0.41.0'
     ktlint fileTree(dir: "$qualityConfigDir/ktlint/libs", include: ['*.jar'])
 
-    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.2.1'
+    detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.17.1'
 
     xmlchecker fileTree(dir: "$qualityConfigDir/xmlchecker/libs", include: ['*.jar'])
 }

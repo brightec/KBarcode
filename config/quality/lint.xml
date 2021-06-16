@@ -6,9 +6,9 @@
         <ignore regexp="simple-xml.*jar" />
     </issue>
 
-	<!-- Ignore warnings in generated files -->
-	<issue id="all">
-    	<ignore path="app/build/generated" />
-    	<ignore path="build/generated" />
+    <!-- Ignore warnings in generated files -->
+    <issue id="all">
+        <ignore path="app/build/generated" />
+        <ignore path="build/generated" />
     </issue>
 </lint>

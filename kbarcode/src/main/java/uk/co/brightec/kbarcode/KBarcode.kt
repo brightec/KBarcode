@@ -10,44 +10,44 @@ import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
 import uk.co.brightec.kbarcode.processor.OnBarcodeListener
 import uk.co.brightec.kbarcode.processor.OnBarcodesListener
 
-class KBarcode {
+public class KBarcode {
 
     @Suppress("TooManyFunctions") // This class does still feels single responsibility
-    interface Scanner : LifecycleObserver {
+    public interface Scanner : LifecycleObserver {
 
-        var onBarcodesListener: OnBarcodesListener?
-        var onBarcodeListener: OnBarcodeListener?
-        val barcodes: LiveData<List<Barcode>>
-        val barcode: LiveData<Barcode>
-        var onCameraErrorListener: OnCameraErrorListener?
+        public var onBarcodesListener: OnBarcodesListener?
+        public var onBarcodeListener: OnBarcodeListener?
+        public val barcodes: LiveData<List<Barcode>>
+        public val barcode: LiveData<Barcode>
+        public var onCameraErrorListener: OnCameraErrorListener?
 
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun start()
+        public fun start()
 
         @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun resume()
+        public fun resume()
 
         @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        fun pause()
+        public fun pause()
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun release()
+        public fun release()
 
-        fun setCameraFacing(facing: Int)
+        public fun setCameraFacing(facing: Int)
 
-        fun setCameraFlashMode(flashMode: Int)
+        public fun setCameraFlashMode(flashMode: Int)
 
-        fun setBarcodeFormats(formats: IntArray)
+        public fun setBarcodeFormats(formats: IntArray)
 
-        fun setMinBarcodeWidth(@Px minBarcodeWidth: Int?)
+        public fun setMinBarcodeWidth(@Px minBarcodeWidth: Int?)
 
-        fun setBarcodesSort(comparator: Comparator<Barcode>?)
+        public fun setBarcodesSort(comparator: Comparator<Barcode>?)
 
-        fun setScaleType(@BarcodeView.ScaleType scaleType: Int)
+        public fun setScaleType(@BarcodeView.ScaleType scaleType: Int)
 
-        fun setClearFocusDelay(delay: Long)
+        public fun setClearFocusDelay(delay: Long)
 
-        fun setOptions(options: Options) {
+        public fun setOptions(options: Options) {
             setCameraFacing(options.cameraFacing)
             setCameraFlashMode(options.cameraFlashMode)
             setBarcodeFormats(options.barcodeFormats)
@@ -58,10 +58,10 @@ class KBarcode {
         }
     }
 
-    companion object {
+    public companion object {
 
         @JvmStatic
-        fun setDebugging(debugging: Boolean) {
+        public fun setDebugging(debugging: Boolean) {
             if (debugging) {
                 Timber.plant(Timber.DebugTree())
             }

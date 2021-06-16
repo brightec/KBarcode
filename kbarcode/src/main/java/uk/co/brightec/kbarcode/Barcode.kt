@@ -23,7 +23,7 @@ import com.google.mlkit.vision.barcode.Barcode as MlBarcode
  * https://firebase.google.com/docs/reference/android/com/google/firebase/ml/vision/barcode/FirebaseVisionBarcode
  */
 @OpenForTesting
-data class Barcode(
+public data class Barcode(
     val boundingBox: Rect?,
     val calendarEvent: CalendarEvent?,
     val contactInfo: ContactInfo?,
@@ -61,25 +61,25 @@ data class Barcode(
         wifi = mlBarcode.wifi?.convert()
     )
 
-    override fun toString() = displayValue ?: super.toString()
+    override fun toString(): String = displayValue ?: super.toString()
 
-    companion object {
+    public companion object {
 
-        const val FORMAT_UNKNOWN = MlBarcode.FORMAT_UNKNOWN
-        const val FORMAT_ALL_FORMATS = MlBarcode.FORMAT_ALL_FORMATS
-        const val FORMAT_CODE_128 = MlBarcode.FORMAT_CODE_128
-        const val FORMAT_CODE_39 = MlBarcode.FORMAT_CODE_39
-        const val FORMAT_CODE_93 = MlBarcode.FORMAT_CODE_93
-        const val FORMAT_CODABAR = MlBarcode.FORMAT_CODABAR
-        const val FORMAT_DATA_MATRIX = MlBarcode.FORMAT_DATA_MATRIX
-        const val FORMAT_EAN_13 = MlBarcode.FORMAT_EAN_13
-        const val FORMAT_EAN_8 = MlBarcode.FORMAT_EAN_8
-        const val FORMAT_ITF = MlBarcode.FORMAT_ITF
-        const val FORMAT_QR_CODE = MlBarcode.FORMAT_QR_CODE
-        const val FORMAT_UPC_A = MlBarcode.FORMAT_UPC_A
-        const val FORMAT_UPC_E = MlBarcode.FORMAT_UPC_E
-        const val FORMAT_PDF417 = MlBarcode.FORMAT_PDF417
-        const val FORMAT_AZTEC = MlBarcode.FORMAT_AZTEC
+        public const val FORMAT_UNKNOWN: Int = MlBarcode.FORMAT_UNKNOWN
+        public const val FORMAT_ALL_FORMATS: Int = MlBarcode.FORMAT_ALL_FORMATS
+        public const val FORMAT_CODE_128: Int = MlBarcode.FORMAT_CODE_128
+        public const val FORMAT_CODE_39: Int = MlBarcode.FORMAT_CODE_39
+        public const val FORMAT_CODE_93: Int = MlBarcode.FORMAT_CODE_93
+        public const val FORMAT_CODABAR: Int = MlBarcode.FORMAT_CODABAR
+        public const val FORMAT_DATA_MATRIX: Int = MlBarcode.FORMAT_DATA_MATRIX
+        public const val FORMAT_EAN_13: Int = MlBarcode.FORMAT_EAN_13
+        public const val FORMAT_EAN_8: Int = MlBarcode.FORMAT_EAN_8
+        public const val FORMAT_ITF: Int = MlBarcode.FORMAT_ITF
+        public const val FORMAT_QR_CODE: Int = MlBarcode.FORMAT_QR_CODE
+        public const val FORMAT_UPC_A: Int = MlBarcode.FORMAT_UPC_A
+        public const val FORMAT_UPC_E: Int = MlBarcode.FORMAT_UPC_E
+        public const val FORMAT_PDF417: Int = MlBarcode.FORMAT_PDF417
+        public const val FORMAT_AZTEC: Int = MlBarcode.FORMAT_AZTEC
 
         @IntDef(
             FORMAT_UNKNOWN,
@@ -99,21 +99,21 @@ data class Barcode(
             FORMAT_AZTEC
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class BarcodeFormat
+        public annotation class BarcodeFormat
 
-        const val TYPE_UNKNOWN = MlBarcode.TYPE_UNKNOWN
-        const val TYPE_CONTACT_INFO = MlBarcode.TYPE_CONTACT_INFO
-        const val TYPE_EMAIL = MlBarcode.TYPE_EMAIL
-        const val TYPE_ISBN = MlBarcode.TYPE_ISBN
-        const val TYPE_PHONE = MlBarcode.TYPE_PHONE
-        const val TYPE_PRODUCT = MlBarcode.TYPE_PRODUCT
-        const val TYPE_SMS = MlBarcode.TYPE_SMS
-        const val TYPE_TEXT = MlBarcode.TYPE_TEXT
-        const val TYPE_URL = MlBarcode.TYPE_URL
-        const val TYPE_WIFI = MlBarcode.TYPE_WIFI
-        const val TYPE_GEO = MlBarcode.TYPE_GEO
-        const val TYPE_CALENDAR_EVENT = MlBarcode.TYPE_CALENDAR_EVENT
-        const val TYPE_DRIVER_LICENSE = MlBarcode.TYPE_DRIVER_LICENSE
+        public const val TYPE_UNKNOWN: Int = MlBarcode.TYPE_UNKNOWN
+        public const val TYPE_CONTACT_INFO: Int = MlBarcode.TYPE_CONTACT_INFO
+        public const val TYPE_EMAIL: Int = MlBarcode.TYPE_EMAIL
+        public const val TYPE_ISBN: Int = MlBarcode.TYPE_ISBN
+        public const val TYPE_PHONE: Int = MlBarcode.TYPE_PHONE
+        public const val TYPE_PRODUCT: Int = MlBarcode.TYPE_PRODUCT
+        public const val TYPE_SMS: Int = MlBarcode.TYPE_SMS
+        public const val TYPE_TEXT: Int = MlBarcode.TYPE_TEXT
+        public const val TYPE_URL: Int = MlBarcode.TYPE_URL
+        public const val TYPE_WIFI: Int = MlBarcode.TYPE_WIFI
+        public const val TYPE_GEO: Int = MlBarcode.TYPE_GEO
+        public const val TYPE_CALENDAR_EVENT: Int = MlBarcode.TYPE_CALENDAR_EVENT
+        public const val TYPE_DRIVER_LICENSE: Int = MlBarcode.TYPE_DRIVER_LICENSE
 
         @IntDef(
             TYPE_UNKNOWN,
@@ -131,6 +131,6 @@ data class Barcode(
             TYPE_DRIVER_LICENSE
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class BarcodeValueType
+        public annotation class BarcodeValueType
     }
 }

@@ -2,7 +2,7 @@ package uk.co.brightec.kbarcode.model
 
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class ContactInfo(
+public data class ContactInfo(
     val addresses: List<Address>,
     val emails: List<Email>,
     val name: PersonName?,

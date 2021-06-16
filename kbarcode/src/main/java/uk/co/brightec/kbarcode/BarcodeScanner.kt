@@ -32,7 +32,7 @@ import uk.co.brightec.kbarcode.util.OpenForTesting
 
 @Suppress("TooManyFunctions") // Still feels single responsibility
 @OpenForTesting
-class BarcodeScanner internal constructor(
+public class BarcodeScanner internal constructor(
     private val cameraSource: Camera2Source,
     private val windowManager: WindowManager,
     private val frameProcessor: BarcodeImageProcessor = BarcodeImageProcessor()
@@ -81,7 +81,7 @@ class BarcodeScanner internal constructor(
 
     private lateinit var handlerClearFocus: Handler
 
-    constructor(context: Context) : this(
+    public constructor(context: Context) : this(
         cameraSource = Camera2Source(context),
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     )
@@ -90,7 +90,7 @@ class BarcodeScanner internal constructor(
         frameProcessor.onImageProcessed = { it.close() }
     }
 
-    fun addSurface(surface: Surface) {
+    public fun addSurface(surface: Surface) {
         updateCameraFeature {
             customSurfaces.add(surface)
         }
@@ -165,9 +165,9 @@ class BarcodeScanner internal constructor(
         clearFocusDelay = delay
     }
 
-    fun getOutputSize(): Size? = cameraSource.getOutputSize(minWidthForBarcodes())
+    public fun getOutputSize(): Size? = cameraSource.getOutputSize(minWidthForBarcodes())
 
-    fun requestCameraFocus(
+    public fun requestCameraFocus(
         viewWidth: Int,
         viewHeight: Int,
         touchX: Float,
@@ -198,7 +198,8 @@ class BarcodeScanner internal constructor(
                 override fun onCameraFailure(e: CameraException) {
                     onCameraErrorListener?.onCameraError(e)
                 }
-            })
+            }
+        )
     }
 
     @Suppress("ReturnCount") // For readability
@@ -207,22 +208,25 @@ class BarcodeScanner internal constructor(
         val size =
             cameraSource.getOutputSize(minWidthForBarcodes()) ?: throw IllegalStateException()
         val reader = createProcessorImageReader(size)
-        reader.setOnImageAvailableListener({
-            val image = it.acquireLatestImage() ?: return@setOnImageAvailableListener
+        reader.setOnImageAvailableListener(
+            {
+                val image = it.acquireLatestImage() ?: return@setOnImageAvailableListener
 
-            if (frameProcessor.isProcessing() || pauseProcessing) {
-                image.close()
-                return@setOnImageAvailableListener
-            }
+                if (frameProcessor.isProcessing() || pauseProcessing) {
+                    image.close()
+                    return@setOnImageAvailableListener
+                }
 
-            val frameMetadata = FrameMetadata(
-                width = it.width,
-                height = it.height,
-                rotation = getRotationCompensation(),
-                cameraFacing = cameraSource.getCameraFacing()
-            )
-            frameProcessor.process(image, frameMetadata)
-        }, null)
+                val frameMetadata = FrameMetadata(
+                    width = it.width,
+                    height = it.height,
+                    rotation = getRotationCompensation(),
+                    cameraFacing = cameraSource.getCameraFacing()
+                )
+                frameProcessor.process(image, frameMetadata)
+            },
+            null
+        )
         imageReader = reader
         return reader.surface
     }
@@ -379,14 +383,17 @@ class BarcodeScanner internal constructor(
             handlerClearFocus = Handler(Looper.getMainLooper())
         }
         handlerClearFocus.removeCallbacksAndMessages(null)
-        handlerClearFocus.postDelayed({
-            if (cameraSource.isStarted()) {
-                cameraSource.clearFocusRegions()
-            }
-        }, delay)
+        handlerClearFocus.postDelayed(
+            {
+                if (cameraSource.isStarted()) {
+                    cameraSource.clearFocusRegions()
+                }
+            },
+            delay
+        )
     }
 
-    companion object {
+    internal companion object {
         @VisibleForTesting
         internal const val BARCODE_SCREEN_PROPORTION = 0.3
         private const val MAX_IMAGES_IN_READER = 3

@@ -26,7 +26,7 @@ import uk.co.brightec.kbarcode.processor.sort.CentralBarcodeComparator
 import uk.co.brightec.kbarcode.util.OpenForTesting
 
 @OpenForTesting
-class BarcodeView @JvmOverloads constructor(
+public class BarcodeView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -330,24 +330,24 @@ class BarcodeView @JvmOverloads constructor(
         }
     }
 
-    companion object {
+    public companion object {
 
         /**
          * Scale the surface uniformly (maintain it's aspect ratio) so that both dimensions
          * (width and height) of the surface will be equal to or less than the corresponding
          * dimension of the parent BarcodeView.
          */
-        const val CENTER_INSIDE = 0
+        public const val CENTER_INSIDE: Int = 0
 
         /**
          * Scale the surface uniformly (maintain it's aspect ratio) so that both dimensions
          * (width and height) of the surface will be equal to or larger than the corresponding
          * dimension of the parent BarcodeView.
          */
-        const val CENTER_CROP = 1
+        public const val CENTER_CROP: Int = 1
 
-        const val CLEAR_FOCUS_DELAY_DEFAULT = 5000L // Millis
-        const val CLEAR_FOCUS_DELAY_NEVER = -1L
+        public const val CLEAR_FOCUS_DELAY_DEFAULT: Long = 5000L // Millis
+        public const val CLEAR_FOCUS_DELAY_NEVER: Long = -1L
     }
 
     @IntDef(
@@ -355,5 +355,5 @@ class BarcodeView @JvmOverloads constructor(
         CENTER_CROP
     )
     @Retention(AnnotationRetention.SOURCE)
-    annotation class ScaleType
+    public annotation class ScaleType
 }
