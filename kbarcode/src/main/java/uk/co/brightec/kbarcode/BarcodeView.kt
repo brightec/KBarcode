@@ -56,7 +56,7 @@ public class BarcodeView @JvmOverloads constructor(
     private val surfaceView = SurfaceView(context)
 
     @ScaleType
-    private var previewScaleType: Int = CENTER_INSIDE
+    private var _previewScaleType: Int = CENTER_INSIDE
         set(value) {
             field = value
             requestLayout()
@@ -97,8 +97,8 @@ public class BarcodeView @JvmOverloads constructor(
                 setMinBarcodeWidth(attrMinBarcodeWidth)
                 val attrSort = getInteger(R.styleable.BarcodeView_sort, 0)
                 setBarcodesSort(sortAttrConvert(attrSort))
-                val attrScaleType = getInteger(R.styleable.BarcodeView_scaleType, 0)
-                setScaleType(scaleTypeAttrConvert(attrScaleType))
+                val attrScaleType = getInteger(R.styleable.BarcodeView_previewScaleType, 0)
+                setPreviewScaleType(previewScaleTypeAttrConvert(attrScaleType))
                 val attrClearFocusDelay = getInteger(
                     R.styleable.BarcodeView_clearFocusDelay,
                     CLEAR_FOCUS_DELAY_DEFAULT.toInt()
@@ -187,8 +187,8 @@ public class BarcodeView @JvmOverloads constructor(
         barcodeScanner.setBarcodesSort(comparator)
     }
 
-    override fun setScaleType(scaleType: Int) {
-        previewScaleType = scaleType
+    override fun setPreviewScaleType(scaleType: Int) {
+        _previewScaleType = scaleType
     }
 
     override fun setClearFocusDelay(delay: Long) {
@@ -197,7 +197,7 @@ public class BarcodeView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val childRect = calculateRectForChild(
-            scaleType = previewScaleType, left = left, top = top, right = right, bottom = bottom
+            scaleType = _previewScaleType, left = left, top = top, right = right, bottom = bottom
         )
 
         for (i in 0 until childCount) {
@@ -254,7 +254,7 @@ public class BarcodeView @JvmOverloads constructor(
     }
 
     @VisibleForTesting
-    internal fun scaleTypeAttrConvert(attr: Int) = when (attr) {
+    internal fun previewScaleTypeAttrConvert(attr: Int) = when (attr) {
         0 -> CENTER_INSIDE
         1 -> CENTER_CROP
         else -> CENTER_INSIDE

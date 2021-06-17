@@ -40,7 +40,7 @@ internal class ProgrammaticActivity :
                     )
                 )
                 .barcodesSort(null)
-                .scaleType(BarcodeView.CENTER_INSIDE)
+                .previewScaleType(BarcodeView.CENTER_INSIDE)
                 .clearFocusDelay(BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT)
                 .build()
         )

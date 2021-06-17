@@ -43,7 +43,7 @@ public class KBarcode {
 
         public fun setBarcodesSort(comparator: Comparator<Barcode>?)
 
-        public fun setScaleType(@BarcodeView.ScaleType scaleType: Int)
+        public fun setPreviewScaleType(@BarcodeView.ScaleType scaleType: Int)
 
         public fun setClearFocusDelay(delay: Long)
 
@@ -53,7 +53,7 @@ public class KBarcode {
             setBarcodeFormats(options.barcodeFormats)
             setMinBarcodeWidth(options.minBarcodeWidth)
             setBarcodesSort(options.barcodesSort)
-            setScaleType(options.scaleType)
+            setPreviewScaleType(options.previewScaleType)
             setClearFocusDelay(options.clearFocusDelay)
         }
     }

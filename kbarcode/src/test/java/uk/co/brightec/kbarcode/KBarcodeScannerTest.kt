@@ -31,7 +31,7 @@ internal class KBarcodeScannerTest {
             on { barcodeFormats } doReturn intArrayOf(1, 2, 3)
             on { minBarcodeWidth } doReturn -2
             on { barcodesSort } doReturn mock()
-            on { scaleType } doReturn -3
+            on { previewScaleType } doReturn -3
             on { clearFocusDelay } doReturn 1234L
         }
 
@@ -44,7 +44,7 @@ internal class KBarcodeScannerTest {
         verify(barcodeScanner).setBarcodeFormats(options.barcodeFormats)
         verify(barcodeScanner).setMinBarcodeWidth(options.minBarcodeWidth)
         verify(barcodeScanner).setBarcodesSort(options.barcodesSort)
-        verify(barcodeScanner).setScaleType(options.scaleType)
+        verify(barcodeScanner).setScaleType(options.previewScaleType)
         verify(barcodeScanner).setClearFocusDelay(options.clearFocusDelay)
     }
 

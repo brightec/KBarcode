@@ -155,7 +155,7 @@ public class BarcodeScanner internal constructor(
         frameProcessor.barcodesSort = comparator
     }
 
-    override fun setScaleType(@BarcodeView.ScaleType scaleType: Int) {
+    override fun setPreviewScaleType(@BarcodeView.ScaleType scaleType: Int) {
         Timber.v("ScaleType has no affect on ${BarcodeScanner::class.java.simpleName}")
     }
 

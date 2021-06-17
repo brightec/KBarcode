@@ -27,7 +27,7 @@
             <enum name="none" value="0" />
             <enum name="central" value="1" />
         </attr>
-        <attr name="scaleType" format="enum">
+        <attr name="previewScaleType" format="enum">
             <enum name="centerInside" value="0" />
             <enum name="centerCrop" value="1" />
         </attr>
