@@ -14,10 +14,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.fragment_viewfinder.*
 import uk.co.brightec.kbarcode.app.R
+import uk.co.brightec.kbarcode.app.databinding.FragmentViewfinderBinding
 
 internal class ViewfinderFragment : Fragment() {
+
+    private var _binding: FragmentViewfinderBinding? = null
+
+    // This property is only valid between onCreateView and onDestroyView.
+    private val binding get() = _binding!!
 
     @VisibleForTesting
     lateinit var viewModel: ViewfinderViewModel
@@ -35,35 +40,38 @@ internal class ViewfinderFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_viewfinder, container, false)
+    ): View {
+        _binding = FragmentViewfinderBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requireActivity().setTitle(R.string.title_viewfinder)
 
-        lifecycle.addObserver(view_barcode)
+        lifecycle.addObserver(binding.viewBarcode)
 
-        viewModel.setData(view_barcode.barcode)
+        viewModel.setData(binding.viewBarcode.barcode)
         viewModel.barcode.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    progress.visibility = View.GONE
+                    binding.progress.visibility = View.GONE
                     val barcode = resource.data
                     Toast.makeText(
                         requireContext(), barcode.displayValue, Toast.LENGTH_SHORT
                     ).show()
-                    view_barcode.resume()
+                    binding.viewBarcode.resume()
                 }
                 is Resource.Error -> {
-                    progress.visibility = View.GONE
+                    binding.progress.visibility = View.GONE
                     Toast.makeText(
                         requireContext(),
                         R.string.error_processing_barcode, Toast.LENGTH_SHORT
                     ).show()
-                    view_barcode.resume()
+                    binding.viewBarcode.resume()
                 }
                 is Resource.Loading -> {
-                    view_barcode.pause()
-                    progress.visibility = View.VISIBLE
+                    binding.viewBarcode.pause()
+                    binding.progress.visibility = View.VISIBLE
                 }
             }
         }
@@ -75,6 +83,11 @@ internal class ViewfinderFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -84,7 +97,7 @@ internal class ViewfinderFragment : Fragment() {
             REQUEST_PERMISSION_CAMERA -> if (
                 grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
             ) {
-                view_barcode.start()
+                binding.viewBarcode.start()
             }
             else ->
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults)

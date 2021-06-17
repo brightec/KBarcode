@@ -12,19 +12,22 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_programmatic.*
 import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.BarcodeView
 import uk.co.brightec.kbarcode.Options
+import uk.co.brightec.kbarcode.app.databinding.ActivityProgrammaticBinding
 
 internal class ProgrammaticActivity :
     AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private lateinit var binding: ActivityProgrammaticBinding
     private lateinit var barcodeView: BarcodeView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_programmatic)
+        binding = ActivityProgrammaticBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
         setTitle(R.string.title_programmatic)
 
@@ -44,7 +47,7 @@ internal class ProgrammaticActivity :
                 .clearFocusDelay(BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT)
                 .build()
         )
-        frame_container.addView(barcodeView)
+        binding.frameContainer.addView(barcodeView)
 
         lifecycle.addObserver(barcodeView)
 
@@ -53,7 +56,7 @@ internal class ProgrammaticActivity :
             for (barcode in barcodes) {
                 builder.append(barcode.displayValue).append("\n")
             }
-            text_barcodes.text = builder.toString()
+            binding.textBarcodes.text = builder.toString()
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)

@@ -1,6 +1,5 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-allopen"
 apply plugin: "com.google.gms.google-services"
 apply from: "$project.rootDir/config/quality/quality.gradle"
@@ -32,6 +31,10 @@ android {
         versionCode getBuildNumber()
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 
     lintOptions {
