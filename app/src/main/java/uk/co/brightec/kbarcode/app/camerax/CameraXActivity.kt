@@ -158,10 +158,12 @@ internal class CameraXActivity :
                     try {
                         val result = future.get()
                         Log.d(tag, "Focus Success: ${result.isFocusSuccessful}")
-                    } catch (e: CameraControl.OperationCanceledException) {
-                        Log.d(tag, "Focus cancelled")
                     } catch (e: ExecutionException) {
-                        Log.e(tag, "Focus failed", e)
+                        if (e.cause is CameraControl.OperationCanceledException) {
+                            Log.d(tag, "Focus cancelled")
+                        } else {
+                            Log.e(tag, "Focus failed", e)
+                        }
                     } catch (e: InterruptedException) {
                         Log.e(tag, "Focus interrupted", e)
                     }
