@@ -9,6 +9,9 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
+    <!--  For CameraX example only  -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:name=".Application"
         android:allowBackup="true"
@@ -30,6 +33,7 @@
         <activity android:name=".XmlJavaActivity" />
         <activity android:name=".ProgrammaticActivity" />
         <activity android:name=".viewfinder.ViewfinderActivity" />
+        <activity android:name=".camerax.CameraXActivity" />
         <!--suppress AndroidDomInspection - For espresso tests-->
         <activity android:name=".testutil.SingleFragmentActivity" />
     </application>
