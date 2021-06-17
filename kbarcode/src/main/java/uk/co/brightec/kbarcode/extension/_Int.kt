@@ -8,7 +8,7 @@ import uk.co.brightec.kbarcode.Barcode
  * produce better results but will slow down performance. So it is recommended you use as close
  * to these minimums as you can.
  *
- * https://firebase.google.com/docs/ml-kit/android/read-barcodes#input-image-guidelines
+ * https://developers.google.com/ml-kit/vision/barcode-scanning/android#input-image-guidelines
  */
 @Suppress("MagicNumber", "ComplexMethod")
 @Px
