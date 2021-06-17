@@ -12,7 +12,7 @@ public data class Options(
     val barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
     @Px val minBarcodeWidth: Int? = null,
     val barcodesSort: BarcodeComparator? = null,
-    @BarcodeView.ScaleType val previewScaleType: Int,
+    @BarcodeView.PreviewScaleType val previewScaleType: Int,
     val clearFocusDelay: Long
 ) {
 
@@ -22,7 +22,7 @@ public data class Options(
         private var barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
         @Px private var minBarcodeWidth: Int? = null,
         private var barcodesSort: BarcodeComparator? = null,
-        @BarcodeView.ScaleType private var previewScaleType: Int = BarcodeView.CENTER_INSIDE,
+        @BarcodeView.PreviewScaleType private var previewScaleType: Int = BarcodeView.CENTER_INSIDE,
         private var clearFocusDelay: Long = BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT
     ) {
 
@@ -50,8 +50,10 @@ public data class Options(
             this.barcodesSort = barcodesSort
         }
 
-        public fun previewScaleType(@BarcodeView.ScaleType scaleType: Int): Builder = apply {
-            this.previewScaleType = scaleType
+        public fun previewScaleType(
+            @BarcodeView.PreviewScaleType previewScaleType: Int
+        ): Builder = apply {
+            this.previewScaleType = previewScaleType
         }
 
         public fun clearFocusDelay(clearFocusDelay: Long): Builder = apply {

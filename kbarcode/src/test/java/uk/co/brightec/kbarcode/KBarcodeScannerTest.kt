@@ -44,7 +44,7 @@ internal class KBarcodeScannerTest {
         verify(barcodeScanner).setBarcodeFormats(options.barcodeFormats)
         verify(barcodeScanner).setMinBarcodeWidth(options.minBarcodeWidth)
         verify(barcodeScanner).setBarcodesSort(options.barcodesSort)
-        verify(barcodeScanner).setScaleType(options.previewScaleType)
+        verify(barcodeScanner).setPreviewScaleType(options.previewScaleType)
         verify(barcodeScanner).setClearFocusDelay(options.clearFocusDelay)
     }
 
@@ -94,7 +94,7 @@ internal class KBarcodeScannerTest {
             // no-op
         }
 
-        override fun setScaleType(scaleType: Int) {
+        override fun setPreviewScaleType(previewScaleType: Int) {
             // no-op
         }
 

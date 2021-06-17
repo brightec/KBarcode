@@ -155,8 +155,8 @@ public class BarcodeScanner internal constructor(
         frameProcessor.barcodesSort = comparator
     }
 
-    override fun setPreviewScaleType(@BarcodeView.ScaleType scaleType: Int) {
-        Timber.v("ScaleType has no affect on ${BarcodeScanner::class.java.simpleName}")
+    override fun setPreviewScaleType(@BarcodeView.PreviewScaleType previewScaleType: Int) {
+        Timber.v("PreviewScaleType has no affect on ${BarcodeScanner::class.java.simpleName}")
     }
 
     @Throws(IllegalArgumentException::class)

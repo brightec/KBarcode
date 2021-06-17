@@ -55,7 +55,7 @@ public class BarcodeView @JvmOverloads constructor(
 
     private val surfaceView = SurfaceView(context)
 
-    @ScaleType
+    @PreviewScaleType
     private var _previewScaleType: Int = CENTER_INSIDE
         set(value) {
             field = value
@@ -97,8 +97,8 @@ public class BarcodeView @JvmOverloads constructor(
                 setMinBarcodeWidth(attrMinBarcodeWidth)
                 val attrSort = getInteger(R.styleable.BarcodeView_sort, 0)
                 setBarcodesSort(sortAttrConvert(attrSort))
-                val attrScaleType = getInteger(R.styleable.BarcodeView_previewScaleType, 0)
-                setPreviewScaleType(previewScaleTypeAttrConvert(attrScaleType))
+                val attrPreviewScaleType = getInteger(R.styleable.BarcodeView_previewScaleType, 0)
+                setPreviewScaleType(previewScaleTypeAttrConvert(attrPreviewScaleType))
                 val attrClearFocusDelay = getInteger(
                     R.styleable.BarcodeView_clearFocusDelay,
                     CLEAR_FOCUS_DELAY_DEFAULT.toInt()
@@ -187,8 +187,8 @@ public class BarcodeView @JvmOverloads constructor(
         barcodeScanner.setBarcodesSort(comparator)
     }
 
-    override fun setPreviewScaleType(scaleType: Int) {
-        _previewScaleType = scaleType
+    override fun setPreviewScaleType(previewScaleType: Int) {
+        _previewScaleType = previewScaleType
     }
 
     override fun setClearFocusDelay(delay: Long) {
@@ -197,7 +197,7 @@ public class BarcodeView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val childRect = calculateRectForChild(
-            scaleType = _previewScaleType, left = left, top = top, right = right, bottom = bottom
+            previewScaleType = _previewScaleType, left = left, top = top, right = right, bottom = bottom
         )
 
         for (i in 0 until childCount) {
@@ -262,7 +262,7 @@ public class BarcodeView @JvmOverloads constructor(
 
     @VisibleForTesting
     internal fun calculateRectForChild(
-        @ScaleType scaleType: Int,
+        @PreviewScaleType previewScaleType: Int,
         left: Int,
         top: Int,
         right: Int,
@@ -293,13 +293,13 @@ public class BarcodeView @JvmOverloads constructor(
         var childWidth = layoutWidth
         var childHeight = (layoutWidth.toFloat() / width.toFloat() * height).toInt()
 
-        if (scaleType == CENTER_INSIDE) {
+        if (previewScaleType == CENTER_INSIDE) {
             // If height is too tall using fit width, do fit height instead.
             if (childHeight > layoutHeight) {
                 childHeight = layoutHeight
                 childWidth = (layoutHeight.toFloat() / height.toFloat() * width).toInt()
             }
-        } else if (scaleType == CENTER_CROP) {
+        } else if (previewScaleType == CENTER_CROP) {
             // If height is too short using fit width, do fit height instead.
             if (childHeight < layoutHeight) {
                 childHeight = layoutHeight
@@ -355,5 +355,5 @@ public class BarcodeView @JvmOverloads constructor(
         CENTER_CROP
     )
     @Retention(AnnotationRetention.SOURCE)
-    public annotation class ScaleType
+    public annotation class PreviewScaleType
 }

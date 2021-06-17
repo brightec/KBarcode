@@ -43,7 +43,7 @@ public class KBarcode {
 
         public fun setBarcodesSort(comparator: Comparator<Barcode>?)
 
-        public fun setPreviewScaleType(@BarcodeView.ScaleType scaleType: Int)
+        public fun setPreviewScaleType(@BarcodeView.PreviewScaleType previewScaleType: Int)
 
         public fun setClearFocusDelay(delay: Long)
 
