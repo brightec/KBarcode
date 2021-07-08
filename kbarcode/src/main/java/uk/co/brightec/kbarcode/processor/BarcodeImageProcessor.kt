@@ -75,7 +75,7 @@ internal class BarcodeImageProcessor(
     internal fun createScanner(): BarcodeScanner {
         val options = BarcodeScannerOptions.Builder()
         if (formats.size > 1) {
-            @Suppress("SpreadOperator") // Required by Firebase API
+            @Suppress("SpreadOperator") // Required by Google API
             options.setBarcodeFormats(
                 formats[0], *formats.slice(IntRange(1, formats.size - 1)).toIntArray()
             )
