@@ -42,6 +42,7 @@ internal class ProgrammaticActivity : AppCompatActivity(),
                 )
                 .barcodesSort(null)
                 .scaleType(BarcodeView.CENTER_INSIDE)
+                .clearFocusDelay(BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT)
                 .build()
         )
         frame_container.addView(barcodeView)

@@ -1,11 +1,13 @@
 package uk.co.brightec.kbarcode.camera
 
+import android.graphics.Rect
 import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.hardware.camera2.CaptureRequest
+import android.hardware.camera2.params.MeteringRectangle
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.os.Handler
 import android.util.Size
@@ -13,6 +15,7 @@ import android.view.Surface
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -27,14 +30,18 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 
+@Suppress("LargeClass")
 @SmallTest
 internal class Camera2SourceTest {
 
     private lateinit var cameraManager: CameraManager
     private lateinit var cameraDevice: CameraDevice
+    private lateinit var session: CameraCaptureSession
 
     private lateinit var cameraSource: Camera2Source
 
@@ -44,6 +51,7 @@ internal class Camera2SourceTest {
         cameraDevice = mock {
             on { id } doReturn "some id"
         }
+        session = mock()
 
         cameraSource = spy(Camera2Source(cameraManager))
     }
@@ -100,14 +108,19 @@ internal class Camera2SourceTest {
     fun cameraDevice__release__closesCameraDevice() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
+        cameraSource.currentSession = session
+        cameraSource.currentSurfaces = mock()
 
         // WHEN
         cameraSource.release()
 
         // THEN
+        verify(session).close()
+        assertNull(cameraSource.currentSession)
         verify(cameraDevice).close()
         assertNull(cameraSource.cameraDevice)
         assertFalse(cameraSource.cameraOpening)
+        assertNull(cameraSource.currentSurfaces)
     }
 
     @Test
@@ -319,6 +332,198 @@ internal class Camera2SourceTest {
     }
 
     @Test
+    fun characteristics__getCameraSensorInfoActiveArraySize__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val rect = mock<Rect>()
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE) } doReturn rect
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraSensorInfoActiveArraySize()
+
+        // THEN
+        assertEquals(rect, result)
+    }
+
+    @Test
+    fun session_noAf__requestFocus__nothing() {
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val afModes = intArrayOf()
+        doReturn(afModes).whenever(cameraSource).getCameraAvailableAfModes()
+
+        // WHEN
+        val regions = arrayOf(mock<MeteringRectangle>())
+        cameraSource.requestFocus(regions)
+
+        // THEN
+        verifyZeroInteractions(session)
+    }
+
+    @Test
+    fun session_noAfRegions__requestFocus__nothing() {
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val afModes = intArrayOf(CameraMetadata.CONTROL_AF_MODE_AUTO)
+        doReturn(afModes).whenever(cameraSource).getCameraAvailableAfModes()
+        doReturn(0).whenever(cameraSource).getCameraAfMaxRegions()
+
+        // WHEN
+        val regions = arrayOf(mock<MeteringRectangle>())
+        cameraSource.requestFocus(regions)
+
+        // THEN
+        verifyZeroInteractions(session)
+    }
+
+    @Test
+    fun session_af__requestFocus__stopRepeating_cancelAf_startAf() {
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val cancelRequest = mock<CaptureRequest>()
+        val cancelRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn cancelRequest
+        }
+        val startRequest = mock<CaptureRequest>()
+        val startRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn startRequest
+        }
+        doReturn(cancelRequestBuilder).doReturn(startRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        val afModes = intArrayOf(CameraMetadata.CONTROL_AF_MODE_AUTO)
+        doReturn(afModes).whenever(cameraSource).getCameraAvailableAfModes()
+        doReturn(1).whenever(cameraSource).getCameraAfMaxRegions()
+
+        // WHEN
+        val regions = arrayOf(mock<MeteringRectangle>())
+        cameraSource.requestFocus(regions)
+
+        // THEN
+        verify(session).stopRepeating()
+        verify(cameraSource).createDefaultCaptureRequestBuilder(null, null)
+        verify(session, times(2)).capture(any(), anyOrNull(), anyOrNull())
+        verify(cancelRequestBuilder)
+            .set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
+        verify(cameraSource).createDefaultCaptureRequestBuilder(null, regions)
+        // Unable to verify the specifics due to mockito limitations
+        // So have to settle for this
+        verify(startRequestBuilder, times(2))
+            .set(anyOrNull<CaptureRequest.Key<Int>>(), eq(1))
+    }
+
+    @Test
+    fun session_af_completeAf__requestFocus__restartRepeatingWithRegions() {
+        // STUB
+        doNothing().whenever(cameraSource).createRepeatingRequest(any(), anyOrNull(), anyOrNull())
+
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val cancelRequest = mock<CaptureRequest>()
+        val cancelRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn cancelRequest
+        }
+        val startRequest = mock<CaptureRequest>()
+        val startRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn startRequest
+        }
+        doReturn(cancelRequestBuilder).doReturn(startRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        val afModes = intArrayOf(CameraMetadata.CONTROL_AF_MODE_AUTO)
+        doReturn(afModes).whenever(cameraSource).getCameraAvailableAfModes()
+        doReturn(1).whenever(cameraSource).getCameraAfMaxRegions()
+        whenever(session.capture(any(), anyOrNull(), anyOrNull())).thenAnswer {
+            val request = it.getArgument<CaptureRequest>(0)
+            val callback = it.getArgument<CameraCaptureSession.CaptureCallback?>(1)
+            callback?.onCaptureCompleted(session, request, mock())
+            1234
+        }
+
+        // WHEN
+        val regions = arrayOf(mock<MeteringRectangle>())
+        cameraSource.requestFocus(regions)
+
+        // THEN
+        verify(cameraSource).createRepeatingRequest(
+            session = session, listener = null, regions = regions
+        )
+    }
+
+    @Test
+    fun session_af_failedAf__requestFocus__restartRepeatingWithRegions() {
+        // STUB
+        doNothing().whenever(cameraSource).createRepeatingRequest(any(), anyOrNull(), anyOrNull())
+
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val cancelRequest = mock<CaptureRequest>()
+        val cancelRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn cancelRequest
+        }
+        val startRequest = mock<CaptureRequest>()
+        val startRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn startRequest
+        }
+        doReturn(cancelRequestBuilder).doReturn(startRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        val afModes = intArrayOf(CameraMetadata.CONTROL_AF_MODE_AUTO)
+        doReturn(afModes).whenever(cameraSource).getCameraAvailableAfModes()
+        doReturn(1).whenever(cameraSource).getCameraAfMaxRegions()
+        whenever(session.capture(any(), anyOrNull(), anyOrNull())).thenAnswer {
+            val request = it.getArgument<CaptureRequest>(0)
+            val callback = it.getArgument<CameraCaptureSession.CaptureCallback?>(1)
+            callback?.onCaptureFailed(session, request, mock())
+            1234
+        }
+
+        // WHEN
+        val regions = arrayOf(mock<MeteringRectangle>())
+        cameraSource.requestFocus(regions)
+
+        // THEN
+        verify(cameraSource).createRepeatingRequest(
+            session = session, listener = null, regions = null
+        )
+    }
+
+    @Test
+    fun session_af__clearFocusRegions__stopRepeating_cancelAf_restartRepeating() {
+        // STUB
+        doNothing().whenever(cameraSource).createRepeatingRequest(any(), anyOrNull(), anyOrNull())
+
+        // GIVEN
+        val session = mock<CameraCaptureSession>()
+        cameraSource.currentSession = session
+        val cancelRequest = mock<CaptureRequest>()
+        val cancelRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn cancelRequest
+        }
+        doReturn(cancelRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+
+        // WHEN
+        cameraSource.clearFocusRegions()
+
+        // THEN
+        verify(session).stopRepeating()
+        verify(cameraSource).createDefaultCaptureRequestBuilder(null, null)
+        verify(session).capture(any(), anyOrNull(), anyOrNull())
+        verify(cancelRequestBuilder)
+            .set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
+        verify(cameraSource).createRepeatingRequest(
+            session = session, listener = null, regions = null
+        )
+    }
+
+    @Test
     fun listInclFacing__selectCamera__isCorrect() {
         // GIVEN
         val cameraId1 = "1"
@@ -384,13 +589,12 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_configured__createCaptureSession__createCaptureRequest() {
+    fun cameraDevice_configured__createCaptureSession__createRepeatingRequest() {
         // STUB
-        doNothing().whenever(cameraSource).createCaptureRequest(any(), anyOrNull(), any())
+        doNothing().whenever(cameraSource).createRepeatingRequest(any(), anyOrNull(), anyOrNull())
 
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
-        val session = mock<CameraCaptureSession>()
         whenever(cameraDevice.createCaptureSession(any(), any(), anyOrNull())).then {
             val stateCallback = it.getArgument<CameraCaptureSession.StateCallback>(1)
             stateCallback.onConfigured(session)
@@ -402,7 +606,11 @@ internal class Camera2SourceTest {
         cameraSource.createCaptureSession(surfaces, listener)
 
         // THEN
-        verify(cameraSource).createCaptureRequest(surfaces, listener, session)
+        verify(cameraSource).currentSession = session
+        verify(cameraSource).currentSurfaces = surfaces
+        verify(cameraSource).createRepeatingRequest(
+            session = session, listener = listener, regions = null
+        )
     }
 
     @Test
@@ -477,100 +685,37 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_session_autoFocus_flashMode__createCaptureRequest__setsRepeatingRequest() {
+    fun session_modes__createRepeatingRequest__setsRepeatingRequest() {
         // GIVEN
-        cameraSource.cameraDevice = cameraDevice
         val session = mock<CameraCaptureSession>()
         val captureRequest = mock<CaptureRequest>()
         val captureRequestBuilder = mock<CaptureRequest.Builder> {
             on { build() } doReturn captureRequest
         }
-        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
-        val autoFocus = 1
-        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
-        val flashMode = -1
-        cameraSource.requestedFlashMode = flashMode
+        doReturn(captureRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        val afMode = 123
+        doReturn(afMode).whenever(cameraSource).selectBestContinuousAfMode()
+        val aeMode = 456
+        doReturn(aeMode).whenever(cameraSource).selectBestContinuousAeMode()
+        val awbMode = 789
+        doReturn(awbMode).whenever(cameraSource).selectBestContinuousAwbMode()
 
         // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = mock(), session = session
+        cameraSource.createRepeatingRequest(
+            session = session, listener = mock(), regions = arrayOf(mock())
         )
 
         // THEN
-        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AF_MODE, autoFocus)
-        verify(captureRequestBuilder).set(CaptureRequest.FLASH_MODE, flashMode)
-        verify(captureRequestBuilder).addTarget(surfaces[0])
-        verify(captureRequestBuilder).addTarget(surfaces[1])
+        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AF_MODE, afMode)
+        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AE_MODE, aeMode)
+        verify(captureRequestBuilder).set(CaptureRequest.CONTROL_AWB_MODE, awbMode)
         verify(session).setRepeatingRequest(captureRequest, null, null)
     }
 
     @Test
-    fun cameraDevice_session_captureIllegalArgExc__createCaptureRequest__release_callsListener() {
+    fun session_modes_requestCameraAccessExc__createRepeatingRequest__release_callsListener() {
         // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val session = mock<CameraCaptureSession>()
-        whenever(cameraDevice.createCaptureRequest(any()))
-            .doThrow(mock<IllegalArgumentException>())
-
-        // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
-        val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
-
-        // THEN
-        verify(cameraSource).release()
-        verify(listener).onCameraFailure(any())
-    }
-
-    @Test
-    fun cameraDevice_session_captureCameraAccessExc__createCaptureRequest__release_callsListener() {
-        // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val session = mock<CameraCaptureSession>()
-        whenever(cameraDevice.createCaptureRequest(any()))
-            .doThrow(mock<android.hardware.camera2.CameraAccessException>())
-
-        // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
-        val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
-
-        // THEN
-        verify(cameraSource).release()
-        verify(listener).onCameraFailure(any<CameraAccessException>())
-    }
-
-    @Test
-    fun cameraDevice_session_captureIllegalStateExc__createCaptureRequest__release_callsListener() {
-        // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val session = mock<CameraCaptureSession>()
-        whenever(cameraDevice.createCaptureRequest(any()))
-            .doThrow(mock<IllegalStateException>())
-
-        // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
-        val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
-
-        // THEN
-        verify(cameraSource).release()
-        verify(listener).onCameraFailure(any())
-    }
-
-    @Test
-    fun cameraDevice_session_requestCameraAccessExc__createCaptureRequest__release_callsListener() {
-        // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val autoFocus = 1
-        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
         val session = mock<CameraCaptureSession> {
             on {
                 setRepeatingRequest(any(), anyOrNull(), anyOrNull())
@@ -580,14 +725,15 @@ internal class Camera2SourceTest {
         val captureRequestBuilder = mock<CaptureRequest.Builder> {
             on { build() } doReturn captureRequest
         }
-        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        doReturn(captureRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        doReturn(123).whenever(cameraSource).selectBestContinuousAfMode()
+        doReturn(456).whenever(cameraSource).selectBestContinuousAeMode()
+        doReturn(789).whenever(cameraSource).selectBestContinuousAwbMode()
 
         // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
         val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
+        cameraSource.createRepeatingRequest(session = session, listener = listener)
 
         // THEN
         verify(cameraSource).release()
@@ -595,11 +741,9 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_session_requestIllegalArgExc__createCaptureRequest__release_callsListener() {
+    fun session_modes_requestIllegalArgExc__createRepeatingRequest__release_callsListener() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
-        val autoFocus = 1
-        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
         val session = mock<CameraCaptureSession> {
             on {
                 setRepeatingRequest(any(), anyOrNull(), anyOrNull())
@@ -609,14 +753,15 @@ internal class Camera2SourceTest {
         val captureRequestBuilder = mock<CaptureRequest.Builder> {
             on { build() } doReturn captureRequest
         }
-        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        doReturn(captureRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        doReturn(123).whenever(cameraSource).selectBestContinuousAfMode()
+        doReturn(456).whenever(cameraSource).selectBestContinuousAeMode()
+        doReturn(789).whenever(cameraSource).selectBestContinuousAwbMode()
 
         // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
         val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
+        cameraSource.createRepeatingRequest(session = session, listener = listener)
 
         // THEN
         verify(cameraSource).release()
@@ -624,11 +769,9 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun cameraDevice_session_requestIllegalStateExc__createCaptureRequest__release_callsListener() {
+    fun session_modes_requestIllegalStateExc__createRepeatingRequest__release_callsListener() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
-        val autoFocus = 1
-        doReturn(autoFocus).whenever(cameraSource).selectBestAutoFocus()
         val session = mock<CameraCaptureSession> {
             on {
                 setRepeatingRequest(any(), anyOrNull(), anyOrNull())
@@ -638,14 +781,15 @@ internal class Camera2SourceTest {
         val captureRequestBuilder = mock<CaptureRequest.Builder> {
             on { build() } doReturn captureRequest
         }
-        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        doReturn(captureRequestBuilder).whenever(cameraSource)
+            .createDefaultCaptureRequestBuilder(anyOrNull(), anyOrNull())
+        doReturn(123).whenever(cameraSource).selectBestContinuousAfMode()
+        doReturn(456).whenever(cameraSource).selectBestContinuousAeMode()
+        doReturn(789).whenever(cameraSource).selectBestContinuousAwbMode()
 
         // WHEN
-        val surfaces = listOf<Surface>(mock(), mock())
         val listener = mock<OnCameraReadyListener>()
-        cameraSource.createCaptureRequest(
-            surfaces = surfaces, listener = listener, session = session
-        )
+        cameraSource.createRepeatingRequest(session = session, listener = listener)
 
         // THEN
         verify(cameraSource).release()
@@ -776,60 +920,283 @@ internal class Camera2SourceTest {
     }
 
     @Test
-    fun continuousAvailable__selectBestAutoFocus__continuous() {
+    fun characteristics__getCameraAvailableAfModes__isCorrect() {
         // GIVEN
         cameraSource.cameraDevice = cameraDevice
-        val available = IntArray(1).apply {
-            this[0] = CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE
-        }
+        val modes = intArrayOf(1, 2, 3)
         val characteristics = mock<CameraCharacteristics> {
-            on { get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES) } doReturn available
+            on { get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES) } doReturn modes
         }
         whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
             .thenReturn(characteristics)
 
         // WHEN
-        val result = cameraSource.selectBestAutoFocus()
+        val result = cameraSource.getCameraAvailableAfModes()
+
+        // THEN
+        assertEquals(modes, result)
+    }
+
+    @Test
+    fun characteristics__getCameraAvailableAeModes__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val modes = intArrayOf(1, 2, 3)
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES) } doReturn modes
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraAvailableAeModes()
+
+        // THEN
+        assertEquals(modes, result)
+    }
+
+    @Test
+    fun characteristics__getCameraAvailableAwbModes__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val modes = intArrayOf(1, 2, 3)
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES) } doReturn modes
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraAvailableAwbModes()
+
+        // THEN
+        assertEquals(modes, result)
+    }
+
+    @Test
+    fun characteristics__getCameraAfMaxRegions__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val maxRegions = 123
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF) } doReturn maxRegions
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraAfMaxRegions()
+
+        // THEN
+        assertEquals(maxRegions, result)
+    }
+
+    @Test
+    fun characteristics__getCameraAeMaxRegions__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val maxRegions = 123
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE) } doReturn maxRegions
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraAeMaxRegions()
+
+        // THEN
+        assertEquals(maxRegions, result)
+    }
+
+    @Test
+    fun characteristics__getCameraAwbMaxRegions__isCorrect() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val maxRegions = 123
+        val characteristics = mock<CameraCharacteristics> {
+            on { get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB) } doReturn maxRegions
+        }
+        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
+            .thenReturn(characteristics)
+
+        // WHEN
+        val result = cameraSource.getCameraAwbMaxRegions()
+
+        // THEN
+        assertEquals(maxRegions, result)
+    }
+
+    @Test
+    fun continuousAvailable__selectBestContinuousAfMode__continuous() {
+        // GIVEN
+        val available = intArrayOf(
+            CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE, CameraMetadata.CONTROL_AF_MODE_AUTO
+        )
+        doReturn(available).whenever(cameraSource).getCameraAvailableAfModes()
+
+        // WHEN
+        val result = cameraSource.selectBestContinuousAfMode()
 
         // THEN
         assertEquals(CameraMetadata.CONTROL_AF_MODE_CONTINUOUS_PICTURE, result)
     }
 
     @Test
-    fun autoAvailable__selectBestAutoFocus__auto() {
+    fun autoAvailable__selectBestContinuousAfMode__auto() {
         // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val available = IntArray(1).apply {
-            this[0] = CameraMetadata.CONTROL_AF_MODE_AUTO
-        }
-        val characteristics = mock<CameraCharacteristics> {
-            on { get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES) } doReturn available
-        }
-        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
-            .thenReturn(characteristics)
+        val available = intArrayOf(
+            CameraMetadata.CONTROL_AF_MODE_AUTO
+        )
+        doReturn(available).whenever(cameraSource).getCameraAvailableAfModes()
 
         // WHEN
-        val result = cameraSource.selectBestAutoFocus()
+        val result = cameraSource.selectBestContinuousAfMode()
 
         // THEN
         assertEquals(CameraMetadata.CONTROL_AF_MODE_AUTO, result)
     }
 
     @Test
-    fun available__selectBestAutoFocus__off() {
+    fun available__selectBestContinuousAfMode__off() {
         // GIVEN
-        cameraSource.cameraDevice = cameraDevice
-        val available = IntArray(1)
-        val characteristics = mock<CameraCharacteristics> {
-            on { get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES) } doReturn available
-        }
-        whenever(cameraManager.getCameraCharacteristics(cameraDevice.id))
-            .thenReturn(characteristics)
+        val available = intArrayOf()
+        doReturn(available).whenever(cameraSource).getCameraAvailableAfModes()
 
         // WHEN
-        val result = cameraSource.selectBestAutoFocus()
+        val result = cameraSource.selectBestContinuousAfMode()
 
         // THEN
         assertEquals(CameraMetadata.CONTROL_AF_MODE_OFF, result)
+    }
+
+    @Test
+    fun onAvailable__selectBestContinuousAeMode__on() {
+        // GIVEN
+        val available = intArrayOf(
+            CameraMetadata.CONTROL_AE_MODE_ON, CameraMetadata.CONTROL_AE_MODE_OFF
+        )
+        doReturn(available).whenever(cameraSource).getCameraAvailableAeModes()
+
+        // WHEN
+        val result = cameraSource.selectBestContinuousAeMode()
+
+        // THEN
+        assertEquals(CameraMetadata.CONTROL_AE_MODE_ON, result)
+    }
+
+    @Test
+    fun available__selectBestContinuousAeMode__off() {
+        // GIVEN
+        val available = intArrayOf()
+        doReturn(available).whenever(cameraSource).getCameraAvailableAeModes()
+
+        // WHEN
+        val result = cameraSource.selectBestContinuousAeMode()
+
+        // THEN
+        assertEquals(CameraMetadata.CONTROL_AE_MODE_OFF, result)
+    }
+
+    @Test
+    fun onAvailable__selectBestContinuousAwbMode__auto() {
+        // GIVEN
+        val available = intArrayOf(
+            CameraMetadata.CONTROL_AWB_MODE_AUTO, CameraMetadata.CONTROL_AWB_MODE_OFF
+        )
+        doReturn(available).whenever(cameraSource).getCameraAvailableAwbModes()
+
+        // WHEN
+        val result = cameraSource.selectBestContinuousAwbMode()
+
+        // THEN
+        assertEquals(CameraMetadata.CONTROL_AWB_MODE_AUTO, result)
+    }
+
+    @Test
+    fun available__selectBestContinuousAwbMode__off() {
+        // GIVEN
+        val available = intArrayOf()
+        doReturn(available).whenever(cameraSource).getCameraAvailableAwbModes()
+
+        // WHEN
+        val result = cameraSource.selectBestContinuousAwbMode()
+
+        // THEN
+        assertEquals(CameraMetadata.CONTROL_AWB_MODE_OFF, result)
+    }
+
+    @Test
+    fun cameraDevice_surfaces_flashMode__createDefaultCaptureRequestBuilder__asExpected() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val surfaces = listOf<Surface>(mock(), mock())
+        cameraSource.currentSurfaces = surfaces
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        val flashMode = -1
+        cameraSource.requestedFlashMode = flashMode
+
+        // WHEN
+        val result = cameraSource.createDefaultCaptureRequestBuilder(
+            listener = mock(), regions = null
+        )
+
+        // THEN
+        assertNotNull(result)
+        verify(captureRequestBuilder).set(CaptureRequest.FLASH_MODE, flashMode)
+        verify(captureRequestBuilder).addTarget(surfaces[0])
+        verify(captureRequestBuilder).addTarget(surfaces[1])
+    }
+
+    @Test
+    fun cameraDevice_surfaces_flashMode_regions__createDefaultCaptureRequestBuilder__asExpected() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        val surfaces = listOf<Surface>(mock(), mock())
+        cameraSource.currentSurfaces = surfaces
+        val captureRequest = mock<CaptureRequest>()
+        val captureRequestBuilder = mock<CaptureRequest.Builder> {
+            on { build() } doReturn captureRequest
+        }
+        whenever(cameraDevice.createCaptureRequest(any())).thenReturn(captureRequestBuilder)
+        val flashMode = -1
+        cameraSource.requestedFlashMode = flashMode
+        val regions = arrayOf(mock<MeteringRectangle>())
+        doReturn(1).whenever(cameraSource).getCameraAfMaxRegions()
+        doReturn(1).whenever(cameraSource).getCameraAeMaxRegions()
+        doReturn(1).whenever(cameraSource).getCameraAwbMaxRegions()
+
+        // WHEN
+        val result = cameraSource.createDefaultCaptureRequestBuilder(
+            listener = mock(), regions = regions
+        )
+
+        // THEN
+        assertNotNull(result)
+        verify(captureRequestBuilder).set(CaptureRequest.FLASH_MODE, flashMode)
+        verify(captureRequestBuilder, times(3))
+            .set(anyOrNull<CaptureRequest.Key<Array<MeteringRectangle>>>(), eq(regions))
+        verify(captureRequestBuilder).addTarget(surfaces[0])
+        verify(captureRequestBuilder).addTarget(surfaces[1])
+    }
+
+    @Test
+    fun cameraDevice_captureIllegalArgExc__createDefaultCaptureRequestBuilder__release_listener() {
+        // GIVEN
+        cameraSource.cameraDevice = cameraDevice
+        whenever(cameraDevice.createCaptureRequest(any()))
+            .doThrow(mock<IllegalArgumentException>())
+
+        // WHEN
+        val listener = mock<OnCameraReadyListener>()
+        cameraSource.createDefaultCaptureRequestBuilder(listener)
+
+        // THEN
+        verify(cameraSource).release()
+        verify(listener).onCameraFailure(any())
     }
 }

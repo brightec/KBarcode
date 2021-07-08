@@ -2,12 +2,12 @@ package uk.co.brightec.kbarcode
 
 import androidx.lifecycle.LiveData
 import androidx.test.filters.SmallTest
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
-import org.junit.Before
-import org.junit.Test
 import uk.co.brightec.kbarcode.camera.OnCameraErrorListener
 import uk.co.brightec.kbarcode.processor.OnBarcodeListener
 import uk.co.brightec.kbarcode.processor.OnBarcodesListener
@@ -32,6 +32,7 @@ internal class KBarcodeScannerTest {
             on { minBarcodeWidth } doReturn -2
             on { barcodesSort } doReturn mock()
             on { scaleType } doReturn -3
+            on { clearFocusDelay } doReturn 1234L
         }
 
         // WHEN
@@ -44,6 +45,7 @@ internal class KBarcodeScannerTest {
         verify(barcodeScanner).setMinBarcodeWidth(options.minBarcodeWidth)
         verify(barcodeScanner).setBarcodesSort(options.barcodesSort)
         verify(barcodeScanner).setScaleType(options.scaleType)
+        verify(barcodeScanner).setClearFocusDelay(options.clearFocusDelay)
     }
 
     private class BarcodeScanner : KBarcode.Scanner {
@@ -93,6 +95,10 @@ internal class KBarcodeScannerTest {
         }
 
         override fun setScaleType(scaleType: Int) {
+            // no-op
+        }
+
+        override fun setClearFocusDelay(delay: Long) {
             // no-op
         }
     }
