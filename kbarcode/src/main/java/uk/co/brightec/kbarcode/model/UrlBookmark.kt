@@ -2,7 +2,7 @@ package uk.co.brightec.kbarcode.model
 
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class UrlBookmark(
+public data class UrlBookmark(
     val title: String?,
     val url: String?
 ) {

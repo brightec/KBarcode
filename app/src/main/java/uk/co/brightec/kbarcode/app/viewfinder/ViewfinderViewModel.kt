@@ -2,6 +2,7 @@ package uk.co.brightec.kbarcode.app.viewfinder
 
 import android.app.Application
 import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -20,9 +21,12 @@ internal class ViewfinderViewModel(
     fun setData(data: LiveData<Barcode>) {
         _barcode.addSource(data) { barcode ->
             _barcode.value = Resource.Loading(barcode)
-            Handler().postDelayed({
-                _barcode.value = Resource.Success(barcode)
-            }, DELAY)
+            Handler(Looper.getMainLooper()).postDelayed(
+                {
+                    _barcode.value = Resource.Success(barcode)
+                },
+                DELAY
+            )
         }
     }
 

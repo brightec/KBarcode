@@ -2,7 +2,7 @@ package uk.co.brightec.kbarcode.model
 
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class DrivingLicense(
+public data class DrivingLicense(
     val addressCity: String?,
     val addressState: String?,
     val addressStreet: String?,

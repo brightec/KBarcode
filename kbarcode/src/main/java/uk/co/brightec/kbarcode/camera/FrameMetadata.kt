@@ -21,7 +21,7 @@ import uk.co.brightec.kbarcode.util.OpenForTesting
  *   @see CameraCharacteristics.LENS_FACING
  */
 @OpenForTesting
-data class FrameMetadata(
+public data class FrameMetadata(
     val width: Int,
     val height: Int,
     val rotation: Int,

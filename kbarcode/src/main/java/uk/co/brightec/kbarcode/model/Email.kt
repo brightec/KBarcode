@@ -3,7 +3,7 @@ package uk.co.brightec.kbarcode.model
 import androidx.annotation.IntDef
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class Email(
+public data class Email(
     val address: String?,
     val body: String?,
     val subject: String?,
@@ -18,14 +18,11 @@ data class Email(
         type = mlEmail.type
     )
 
-    companion object {
+    public companion object {
 
-        const val TYPE_HOME =
-            MlBarcode.Email.TYPE_HOME
-        const val TYPE_UNKNOWN =
-            MlBarcode.Email.TYPE_UNKNOWN
-        const val TYPE_WORK =
-            MlBarcode.Email.TYPE_WORK
+        public const val TYPE_HOME: Int = MlBarcode.Email.TYPE_HOME
+        public const val TYPE_UNKNOWN: Int = MlBarcode.Email.TYPE_UNKNOWN
+        public const val TYPE_WORK: Int = MlBarcode.Email.TYPE_WORK
 
         @IntDef(
             TYPE_HOME,
@@ -33,7 +30,7 @@ data class Email(
             TYPE_WORK
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class EmailType
+        public annotation class EmailType
     }
 }
 

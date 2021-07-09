@@ -13,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.fragment_viewfinder.*
 import uk.co.brightec.kbarcode.app.R
@@ -44,7 +43,7 @@ internal class ViewfinderFragment : Fragment() {
         lifecycle.addObserver(view_barcode)
 
         viewModel.setData(view_barcode.barcode)
-        viewModel.barcode.observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.barcode.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     progress.visibility = View.GONE
@@ -67,7 +66,7 @@ internal class ViewfinderFragment : Fragment() {
                     progress.visibility = View.VISIBLE
                 }
             }
-        })
+        }
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED

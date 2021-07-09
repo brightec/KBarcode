@@ -3,7 +3,7 @@ package uk.co.brightec.kbarcode.model
 import androidx.annotation.IntDef
 import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 
-data class Address(
+public data class Address(
     val addressLines: List<String>,
     @AddressType
     val type: Int
@@ -14,14 +14,11 @@ data class Address(
         type = mlAddress.type
     )
 
-    companion object {
+    public companion object {
 
-        const val TYPE_HOME =
-            MlBarcode.Address.TYPE_HOME
-        const val TYPE_UNKNOWN =
-            MlBarcode.Address.TYPE_UNKNOWN
-        const val TYPE_WORK =
-            MlBarcode.Address.TYPE_WORK
+        public const val TYPE_HOME: Int = MlBarcode.Address.TYPE_HOME
+        public const val TYPE_UNKNOWN: Int = MlBarcode.Address.TYPE_UNKNOWN
+        public const val TYPE_WORK: Int = MlBarcode.Address.TYPE_WORK
 
         @IntDef(
             TYPE_HOME,
@@ -29,6 +26,6 @@ data class Address(
             TYPE_WORK
         )
         @Retention(AnnotationRetention.SOURCE)
-        annotation class AddressType
+        public annotation class AddressType
     }
 }

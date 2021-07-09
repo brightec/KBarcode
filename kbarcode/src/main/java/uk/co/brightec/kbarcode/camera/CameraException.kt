@@ -3,7 +3,7 @@ package uk.co.brightec.kbarcode.camera
 /**
  * An exception relating to the camera device.
  */
-open class CameraException(
+public open class CameraException(
     message: String? = null,
     cause: Throwable? = null
 ) : IllegalStateException(message, cause)
@@ -16,7 +16,7 @@ open class CameraException(
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_IN_USE
  */
-class CameraInUseException(
+public class CameraInUseException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -30,7 +30,7 @@ class CameraInUseException(
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_MAX_CAMERAS_IN_USE
  */
-class MaxCamerasInUseException(
+public class MaxCamerasInUseException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -40,7 +40,7 @@ class MaxCamerasInUseException(
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_DISABLED
  */
-class CameraDisabledException(
+public class CameraDisabledException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -52,7 +52,7 @@ class CameraDisabledException(
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_DEVICE
  */
-class CameraDeviceException(
+public class CameraDeviceException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -65,7 +65,7 @@ class CameraDeviceException(
  *
  * @see android.hardware.camera2.CameraDevice.StateCallback.ERROR_CAMERA_SERVICE
  */
-class CameraServiceException(
+public class CameraServiceException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -75,7 +75,7 @@ class CameraServiceException(
  *
  * @see android.hardware.camera2.CameraCaptureSession.StateCallback.onConfigureFailed
  */
-class CameraSessionException(
+public class CameraSessionException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)
@@ -85,7 +85,7 @@ class CameraSessionException(
  *
  * @see android.hardware.camera2.CameraDevice.createCaptureSession
  */
-class CameraAccessException(
+public class CameraAccessException(
     message: String? = null,
     cause: Throwable? = null
 ) : CameraException(message, cause)

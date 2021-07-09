@@ -10,11 +10,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_xml.*
 
-internal class XmlActivity : AppCompatActivity(),
-    ActivityCompat.OnRequestPermissionsResultCallback {
+internal class XmlActivity :
+    AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,13 +23,13 @@ internal class XmlActivity : AppCompatActivity(),
 
         lifecycle.addObserver(view_barcode)
 
-        view_barcode.barcodes.observe(this, Observer { barcodes ->
+        view_barcode.barcodes.observe(this) { barcodes ->
             val builder = StringBuilder()
             for (barcode in barcodes) {
                 builder.append(barcode.displayValue).append("\n")
             }
             text_barcodes.text = builder.toString()
-        })
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED

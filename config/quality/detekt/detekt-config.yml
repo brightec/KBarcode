@@ -514,7 +514,7 @@ style:
   RedundantExplicitType:
     active: false
   RedundantVisibilityModifierRule:
-    active: true
+    active: false
   ReturnCount:
     active: false
     max: 2

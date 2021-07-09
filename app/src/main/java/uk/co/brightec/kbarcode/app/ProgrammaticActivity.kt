@@ -12,14 +12,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_programmatic.*
 import uk.co.brightec.kbarcode.Barcode
 import uk.co.brightec.kbarcode.BarcodeView
 import uk.co.brightec.kbarcode.Options
 
-internal class ProgrammaticActivity : AppCompatActivity(),
-    ActivityCompat.OnRequestPermissionsResultCallback {
+internal class ProgrammaticActivity :
+    AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     private lateinit var barcodeView: BarcodeView
 
@@ -49,13 +48,13 @@ internal class ProgrammaticActivity : AppCompatActivity(),
 
         lifecycle.addObserver(barcodeView)
 
-        barcodeView.barcodes.observe(this, Observer { barcodes ->
+        barcodeView.barcodes.observe(this) { barcodes ->
             val builder = StringBuilder()
             for (barcode in barcodes) {
                 builder.append(barcode.displayValue).append("\n")
             }
             text_barcodes.text = builder.toString()
-        })
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
