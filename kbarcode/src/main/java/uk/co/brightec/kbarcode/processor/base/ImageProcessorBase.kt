@@ -63,7 +63,7 @@ internal abstract class ImageProcessorBase<T> : ImageProcessor {
         image: Image,
         metadata: FrameMetadata
     ) {
-        @Suppress("TooGenericExceptionCaught") // As specific as we can be with Firebase
+        @Suppress("TooGenericExceptionCaught") // As specific as we can be with API
         try {
             val inputImage = convertToInputImage(image, metadata)
             val result = detectInImage(inputImage).await()

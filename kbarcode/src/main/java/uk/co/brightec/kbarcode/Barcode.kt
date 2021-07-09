@@ -19,8 +19,8 @@ import com.google.mlkit.vision.barcode.Barcode as MlBarcode
 /**
  * Main data class to represent a barcode
  *
- * This class wraps the underlying FirebaseVisionBarcode
- * https://firebase.google.com/docs/reference/android/com/google/firebase/ml/vision/barcode/FirebaseVisionBarcode
+ * This class wraps the underlying Barcode
+ * https://developers.google.com/android/reference/com/google/mlkit/vision/barcode/Barcode
  */
 @OpenForTesting
 public data class Barcode(
