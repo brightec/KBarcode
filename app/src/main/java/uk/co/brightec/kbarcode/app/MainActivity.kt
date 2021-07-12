@@ -3,6 +3,7 @@ package uk.co.brightec.kbarcode.app
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import uk.co.brightec.kbarcode.app.camerax.CameraXActivity
 import uk.co.brightec.kbarcode.app.viewfinder.ViewfinderActivity
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +26,10 @@ class MainActivity : AppCompatActivity() {
         }
         button_viewfinder.setOnClickListener {
             val intent = ViewfinderActivity.getStartingIntent(this)
+            startActivity(intent)
+        }
+        button_camerax.setOnClickListener {
+            val intent = CameraXActivity.getStartingIntent(this)
             startActivity(intent)
         }
     }

@@ -6,6 +6,7 @@
     <string name="title_programmatic">Programmatic Based</string>
     <string name="title_viewfinder">Viewfinder Based</string>
     <string name="title_camera_rationale">Why camera?</string>
+    <string name="title_camerax">CameraX Example</string>
 
     <string name="message_camera_rationale">We use your camera to scan barcodes</string>
 

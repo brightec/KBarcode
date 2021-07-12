@@ -197,7 +197,8 @@ public class BarcodeView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val childRect = calculateRectForChild(
-            previewScaleType = _previewScaleType, left = left, top = top, right = right, bottom = bottom
+            previewScaleType = _previewScaleType,
+            left = left, top = top, right = right, bottom = bottom
         )
 
         for (i in 0 until childCount) {
