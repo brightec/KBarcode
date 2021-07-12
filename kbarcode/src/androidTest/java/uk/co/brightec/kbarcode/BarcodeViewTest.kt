@@ -334,15 +334,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualWidthTaller_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 100, 250)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -355,15 +356,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualWidthShorter_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 100, 150)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -376,15 +378,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualHeightWider_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 150, 200)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -397,15 +400,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualHeightNarrower_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 50, 200)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -418,15 +422,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualWidthTaller_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 250, 100)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -439,15 +444,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualWidthShorter_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 150, 100)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -460,15 +466,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualHeightWider_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 200, 150)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -481,15 +488,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerInside_viewEqualHeightNarrower_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_INSIDE
+        val previewScaleType = BarcodeView.CENTER_INSIDE
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 200, 50)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -502,15 +510,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualWidthTaller_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 100, 250)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -523,15 +532,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualWidthShorter_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 100, 150)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -544,15 +554,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualHeightWider_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 150, 200)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -565,15 +576,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualHeightNarrower_portrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 50, 200)
         doReturn(true).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -586,15 +598,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualWidthTaller_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 250, 100)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -607,15 +620,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualWidthShorter_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 150, 100)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -628,15 +642,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualHeightWider_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 200, 150)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN
@@ -649,15 +664,16 @@ internal class BarcodeViewTest {
     @Test
     fun centerCrop_viewEqualHeightNarrower_notPortrait__calculateRectForChild__isCorrect() {
         // GIVEN
-        val scaleType = BarcodeView.CENTER_CROP
+        val previewScaleType = BarcodeView.CENTER_CROP
         whenever(barcodeScanner.getOutputSize()).thenReturn(Size(200, 100))
         val viewRect = Rect(0, 0, 200, 50)
         doReturn(false).whenever(barcodeView).isPortraitMode()
 
         // WHEN
         val result = barcodeView.calculateRectForChild(
-            scaleType = scaleType, left = viewRect.left, top = viewRect.top, right = viewRect.right,
-            bottom = viewRect.bottom
+            previewScaleType = previewScaleType,
+            left = viewRect.left, top = viewRect.top,
+            right = viewRect.right, bottom = viewRect.bottom
         )
 
         // THEN

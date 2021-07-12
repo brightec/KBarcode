@@ -12,7 +12,7 @@ public data class Options(
     val barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
     @Px val minBarcodeWidth: Int? = null,
     val barcodesSort: BarcodeComparator? = null,
-    @BarcodeView.ScaleType val scaleType: Int,
+    @BarcodeView.PreviewScaleType val previewScaleType: Int,
     val clearFocusDelay: Long
 ) {
 
@@ -22,7 +22,7 @@ public data class Options(
         private var barcodeFormats: IntArray = intArrayOf(Barcode.FORMAT_ALL_FORMATS),
         @Px private var minBarcodeWidth: Int? = null,
         private var barcodesSort: BarcodeComparator? = null,
-        @BarcodeView.ScaleType private var scaleType: Int = BarcodeView.CENTER_INSIDE,
+        @BarcodeView.PreviewScaleType private var previewScaleType: Int = BarcodeView.CENTER_INSIDE,
         private var clearFocusDelay: Long = BarcodeView.CLEAR_FOCUS_DELAY_DEFAULT
     ) {
 
@@ -50,8 +50,10 @@ public data class Options(
             this.barcodesSort = barcodesSort
         }
 
-        public fun scaleType(@BarcodeView.ScaleType scaleType: Int): Builder = apply {
-            this.scaleType = scaleType
+        public fun previewScaleType(
+            @BarcodeView.PreviewScaleType previewScaleType: Int
+        ): Builder = apply {
+            this.previewScaleType = previewScaleType
         }
 
         public fun clearFocusDelay(clearFocusDelay: Long): Builder = apply {
@@ -64,7 +66,7 @@ public data class Options(
             barcodeFormats = barcodeFormats,
             minBarcodeWidth = minBarcodeWidth,
             barcodesSort = barcodesSort,
-            scaleType = scaleType,
+            previewScaleType = previewScaleType,
             clearFocusDelay = clearFocusDelay
         )
     }
@@ -80,7 +82,7 @@ public data class Options(
         if (!barcodeFormats.contentEquals(other.barcodeFormats)) return false
         if (minBarcodeWidth != other.minBarcodeWidth) return false
         if (barcodesSort != other.barcodesSort) return false
-        if (scaleType != other.scaleType) return false
+        if (previewScaleType != other.previewScaleType) return false
         if (clearFocusDelay != other.clearFocusDelay) return false
 
         return true
@@ -92,7 +94,7 @@ public data class Options(
         result = 31 * result + barcodeFormats.contentHashCode()
         result = 31 * result + minBarcodeWidth.hashCode()
         result = 31 * result + (barcodesSort?.hashCode() ?: 0)
-        result = 31 * result + scaleType.hashCode()
+        result = 31 * result + previewScaleType.hashCode()
         result = 31 * result + clearFocusDelay.hashCode()
         return result
     }
