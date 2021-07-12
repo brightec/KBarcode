@@ -10,25 +10,29 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_xml.*
+import uk.co.brightec.kbarcode.app.databinding.ActivityXmlBinding
 
 internal class XmlActivity :
     AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
+    private lateinit var binding: ActivityXmlBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_xml)
+        binding = ActivityXmlBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.black))
         setTitle(R.string.title_xml)
 
-        lifecycle.addObserver(view_barcode)
+        lifecycle.addObserver(binding.viewBarcode)
 
-        view_barcode.barcodes.observe(this) { barcodes ->
+        binding.viewBarcode.barcodes.observe(this) { barcodes ->
             val builder = StringBuilder()
             for (barcode in barcodes) {
                 builder.append(barcode.displayValue).append("\n")
             }
-            text_barcodes.text = builder.toString()
+            binding.textBarcodes.text = builder.toString()
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -47,7 +51,7 @@ internal class XmlActivity :
             REQUEST_PERMISSION_CAMERA -> if (
                 grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
             ) {
-                view_barcode.start()
+                binding.viewBarcode.start()
             }
             else ->
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults)

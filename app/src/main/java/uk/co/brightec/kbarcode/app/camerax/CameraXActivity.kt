@@ -19,10 +19,8 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_camerax.*
-import kotlinx.android.synthetic.main.activity_camerax.text_barcodes
-import kotlinx.android.synthetic.main.activity_programmatic.*
 import uk.co.brightec.kbarcode.app.R
+import uk.co.brightec.kbarcode.app.databinding.ActivityCameraxBinding
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -32,12 +30,15 @@ internal class CameraXActivity :
 
     private val tag = CameraXActivity::class.simpleName ?: "CameraXActivity"
 
+    private lateinit var binding: ActivityCameraxBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var camera: Camera
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camerax)
+        binding = ActivityCameraxBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         setTitle(R.string.title_camerax)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -105,7 +106,7 @@ internal class CameraXActivity :
                 val previewUseCase = Preview.Builder()
                     .build()
                     .also {
-                        it.setSurfaceProvider(preview.surfaceProvider)
+                        it.setSurfaceProvider(binding.preview.surfaceProvider)
                     }
                 val imageAnalyzerUseCase = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -118,7 +119,7 @@ internal class CameraXActivity :
                                 for (barcode in barcodes) {
                                     builder.append(barcode.displayValue).append("\n")
                                 }
-                                text_barcodes.text = builder.toString()
+                                binding.textBarcodes.text = builder.toString()
                             }
                         )
                     }
@@ -135,7 +136,7 @@ internal class CameraXActivity :
     }
 
     private fun setupTapToFocus() {
-        preview.setOnTouchListener { view, event ->
+        binding.preview.setOnTouchListener { view, event ->
             val actionMasked = event.actionMasked
             if (actionMasked == MotionEvent.ACTION_UP) {
                 view.performClick()
@@ -146,7 +147,7 @@ internal class CameraXActivity :
             }
 
             val cameraControl = camera.cameraControl
-            val factory = preview.meteringPointFactory
+            val factory = binding.preview.meteringPointFactory
             val point = factory.createPoint(event.x, event.y)
             val action = FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
                 .addPoint(point, FocusMeteringAction.FLAG_AE)

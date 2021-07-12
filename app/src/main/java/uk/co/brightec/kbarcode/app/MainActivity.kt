@@ -2,33 +2,37 @@ package uk.co.brightec.kbarcode.app
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
 import uk.co.brightec.kbarcode.app.camerax.CameraXActivity
+import uk.co.brightec.kbarcode.app.databinding.ActivityMainBinding
 import uk.co.brightec.kbarcode.app.viewfinder.ViewfinderActivity
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        button_xml.setOnClickListener {
+        binding.buttonXml.setOnClickListener {
             val intent = XmlActivity.getStartingIntent(this)
             startActivity(intent)
         }
-        button_xml_java.setOnClickListener {
+        binding.buttonXmlJava.setOnClickListener {
             val intent = XmlJavaActivity.getStartingIntent(this)
             startActivity(intent)
         }
-        button_programmatic.setOnClickListener {
+        binding.buttonProgrammatic.setOnClickListener {
             val intent = ProgrammaticActivity.getStartingIntent(this)
             startActivity(intent)
         }
-        button_viewfinder.setOnClickListener {
+        binding.buttonViewfinder.setOnClickListener {
             val intent = ViewfinderActivity.getStartingIntent(this)
             startActivity(intent)
         }
-        button_camerax.setOnClickListener {
+        binding.buttonCamerax.setOnClickListener {
             val intent = CameraXActivity.getStartingIntent(this)
             startActivity(intent)
         }
