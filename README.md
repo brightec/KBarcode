@@ -30,6 +30,14 @@ We can understand why you may think that, but there are some key reasons we deci
 implementation 'uk.co.brightec.kbarcode:kbarcode:$version'
 ```
 
+## Releases
+
+See the [releases](https://github.com/brightec/KBarcode/releases) section for details about each release and any migration steps required.
+
+**Releases requiring migration:** `1.0.2`, `1.0.3`, `1.3.0`
+
+**Releases with behaviour changes:** `1.1.0`, `1.2.3`
+
 ## Wiki
 
 For a detailed look at the library and a full get started guide checkout the [wiki](https://github.com/brightec/KBarcode/wiki)
