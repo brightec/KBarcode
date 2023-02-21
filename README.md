@@ -1,5 +1,19 @@
 # KBarcode
 
+--------------------------------------
+
+**:warning: Deprecated**: This library is no longer maintained
+
+This library was written before the first stable release of the CameraX library. It was intended to provide a thorough and high quality implementation of the camera2 APIs. Since the launch of CameraX and it's ongoing development, we would recommend using that library for a barcode scanning use case.
+
+To help you migrate we already have an example of a CameraX implementation within the demo app included in this repo. See also [CameraX section](https://github.com/brightec/KBarcode/wiki/Sample#camerax-example) of our wiki
+
+--------------------------------------
+
+<br/>
+<br/>
+<br/>
+
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/uk.co.brightec.kbarcode/kbarcode/badge.png?style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/uk.co.brightec.kbarcode/kbarcode)
 
 A library to help implement barcode scanning.
