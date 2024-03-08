@@ -2,6 +2,12 @@
 
 --------------------------------------
 
+**:warning: Signing key revoked**
+
+The key used to sign the maven central distributions for this library has been revoked. If you have issues importing them, we suggest either migrating to CameraX (see deprecation notice below) or importing the source code of this library directly into you project.
+
+--------------------------------------
+
 **:warning: Deprecated**: This library is no longer maintained
 
 This library was written before the first stable release of the CameraX library. It was intended to provide a thorough and high quality implementation of the camera2 APIs. Since the launch of CameraX and it's ongoing development, we would recommend using that library for a barcode scanning use case.
